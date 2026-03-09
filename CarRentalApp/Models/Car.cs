@@ -12,7 +12,10 @@ namespace CarRentalApp.Models
         [Required(ErrorMessage = "Model name cannot be empty!")]
         [StringLength(50)]
         public string Model { get; set; } = string.Empty;
-
+        public string FullName => $"{Brand} {Model}";
+        public decimal PricePerDay { get; set; }
+        [Required(ErrorMessage = "Image path cannot be empty!")]
+        public string ImagePath { get; set; } = string.Empty;
         public int SeatsCount { get; set; }
         public int DoorsCount { get; set; }
         [Required(ErrorMessage = "Gearbox type name cannot be empty!")]
