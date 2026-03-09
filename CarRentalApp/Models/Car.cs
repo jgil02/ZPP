@@ -8,6 +8,12 @@ namespace CarRentalApp.Models
 
         public string Brand { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
+        public string FullName => $"{Brand} {Model}";
+        public decimal PricePerDay { get; set; }
+        public string ImagePath { get; set; } = string.Empty;
+        public bool IsAvailable { get; set; } = true;
+
+
         public int SeatsCount { get; set; }
         public int DoorsCount { get; set; }
         public string GearboxType { get; set; } = string.Empty;

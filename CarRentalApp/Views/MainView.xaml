@@ -3,10 +3,142 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CarRentalApp"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        xmlns:vm="clr-namespace:CarRentalApp.ViewModels"
+        xmlns:conv="clr-namespace:CarRentalApp.Converters"
+        Title="AutoExpert - Panel Zarządzania" 
+        Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#F1F2F6">
 
+    <Window.Resources>
+        <conv:StatusConverter x:Key="StatusConverter"/>
+        <conv:StatusColorConverter x:Key="StatusColorConverter"/>
+
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#BDC3C7"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#34495E"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <!-- podział ekranu -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- sidebar -->
+        <Border Grid.Column="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="#2C3E50" Offset="0"/>
+                    <GradientStop Color="#000000" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <StackPanel Margin="20">
+                <TextBlock Text="AutoExpert" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
+                <Button Content="Samochody" Style="{StaticResource MenuButtonStyle}"/>
+                <Button Content="Klienci" Style="{StaticResource MenuButtonStyle}"/>
+                <Button Content="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
+                <Separator Background="#34495E" Margin="0,20"/>
+                <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- lista -->
+        <Grid Grid.Column="1" Margin="30">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                <TextBlock Text="Lista Samochodów" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" Width="300"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Cars}" Margin="0,10,0,0">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="350" Height="350" Background="White" CornerRadius="12" Margin="15,15,25,25">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="15" Opacity="0.50" ShadowDepth="6" Direction="315" Color="Black"/>
+                                </Border.Effect>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="15,15,15,0">
+                                        <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" 
+                                                   Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
+                                    </StackPanel>
+
+                                    <Image Grid.Row="1" Source="{Binding ImagePath}" Margin="20,10,20,10" Stretch="Uniform"/>
+
+                                    <Grid Grid.Row="2" Margin="20,0,20,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0" Text="{Binding FullName}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding PricePerDay}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
+                                            <TextBlock Text=" zł / dzień" FontSize="12" Foreground="#95A5A6" VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Grid.Row="3" Margin="20,0,20,20" Foreground="#95A5A6" FontSize="13">
+                                        <Run Text="{Binding FuelType}"/>
+                                        <Run Text=" • "/>
+                                        <Run Text="{Binding GearboxType}"/>
+                                    </TextBlock>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Window>
