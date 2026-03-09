@@ -2,66 +2,75 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Linq;
-using CarRentalApp.Models;
+using CarRentalApp.Views; 
 
 namespace CarRentalApp.ViewModels
 {
+    
     public partial class LoginViewModel : BaseViewModel
     {
         [ObservableProperty]
         private string _username = "";
 
         [ObservableProperty]
-        private string _password = "";
-
-        [ObservableProperty]
         private string _errorMessage = "";
 
+       
         [RelayCommand]
-        private void Login()
+        private void Login(object parameter)
         {
+           
+            var passwordBox = parameter as System.Windows.Controls.PasswordBox;
+            string password = passwordBox?.Password ?? "";
+
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(password))
+            {
+                ErrorMessage = "Wpisz login i hasło!";
+                return;
+            }
+
+           
             
-            if (Username == "admin" && Password == "admin")
+            if (Username == "admin" && password == "admin")
             {
                 OpenWorkerPanel();
-                return;
             }
-
             
-            if (Username == "klient" && Password == "klient")
+            else if (Username == "klient" && password == "klient")
             {
                 OpenClientPanel();
-                return;
             }
+            else
+            {
+                ErrorMessage = "Błędny login lub hasło!";
+            }
+        }
 
-            ErrorMessage = "Nieprawidłowe dane logowania!";
+        
+        [RelayCommand]
+        private void OpenRegistration()
+        {
+            
+            var registerWindow = new RegisterView();
+            registerWindow.ShowDialog();
         }
 
         private void OpenWorkerPanel()
         {
-            var mainView = new Views.MainView(); 
+            var mainView = new MainView();
             mainView.Show();
             CloseLoginWindow();
         }
 
         private void OpenClientPanel()
         {
-            
-            MessageBox.Show("Zalogowano jako Klient! Tu otworzy się Twój panel rezerwacji.");
+            MessageBox.Show("Witaj");
             
         }
 
         private void CloseLoginWindow()
         {
-            
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window.DataContext == this)
-                {
-                    window.Close();
-                    break;
-                }
-            }
+            Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is LoginView)?.Close();
         }
     }
 }
