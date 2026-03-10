@@ -6,6 +6,12 @@ namespace CarRentalApp.Models
     {
         [Key]
         public int ClientID { get; set; }
+        [Required(ErrorMessage = "Login cannot be empty!")]
+        [StringLength(30)]
+        public string Username { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Password cannot be empty!")]
+        [StringLength(30)]
+        public string Password { get; set; } = string.Empty;
         [Required(ErrorMessage = "First name cannot be empty!")]
         [StringLength(50)]
         public string FirstName { get; set; } = string.Empty;
