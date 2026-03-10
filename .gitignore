@@ -416,3 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/CarRentalApp/Data/AppDbContext.cs
+/CarRentalApp/Data/AppDbContext.cs
