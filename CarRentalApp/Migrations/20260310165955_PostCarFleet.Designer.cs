@@ -4,6 +4,7 @@ using CarRentalApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRentalApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260310165955_PostCarFleet")]
+    partial class PostCarFleet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,7 +66,6 @@ namespace CarRentalApp.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("PricePerDay")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Seats")
@@ -102,7 +104,7 @@ namespace CarRentalApp.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("CarFleets");
+                    b.ToTable("CarFleet");
                 });
 
             modelBuilder.Entity("CarRentalApp.Models.Client", b =>
@@ -145,11 +147,6 @@ namespace CarRentalApp.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -164,11 +161,6 @@ namespace CarRentalApp.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("ClientID");
 
@@ -197,7 +189,6 @@ namespace CarRentalApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("WorkerId")
@@ -268,13 +259,13 @@ namespace CarRentalApp.Migrations
                     b.HasOne("CarRentalApp.Models.CarFleet", "CarFleet")
                         .WithMany("Reservations")
                         .HasForeignKey("CarVin")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarRentalApp.Models.Client", "Client")
                         .WithMany("Reservations")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarRentalApp.Models.Worker", "Worker")

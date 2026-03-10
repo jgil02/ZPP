@@ -11,7 +11,7 @@ namespace CarRentalApp.Models
 
         public string CarVin { get; set; } = string.Empty;
         [ForeignKey(nameof(CarVin))]
-        public virtual Car Car { get; set; } = null!;
+        public virtual CarFleet CarFleet { get; set; } = null!;
 
         public int ClientId { get; set; }
         [ForeignKey(nameof(ClientId))]
