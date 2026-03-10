@@ -20,6 +20,8 @@ namespace CarRentalApp.Models
         public bool IsAvailable { get; set; } = true;
         public string CarId { get; set; } = string.Empty;
 
+        public int Mileage { get; set; }
+
         [ForeignKey(nameof(CarId))]
         public virtual Car Car { get; set; } = null!;
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();

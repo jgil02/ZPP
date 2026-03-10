@@ -16,7 +16,8 @@ namespace CarRentalApp.Models
         public decimal PricePerDay { get; set; }
         [Required(ErrorMessage = "Image path cannot be empty!")]
         public string ImagePath { get; set; } = string.Empty;
-        public int SeatsCount { get; set; } public int Seats { get; set; }
+        public int SeatsCount { get; set; }
+        public string Segment { get; set; } = string.Empty;
         public int DoorsCount { get; set; }
         [Required(ErrorMessage = "Gearbox type name cannot be empty!")]
         [StringLength(30)]
