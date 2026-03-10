@@ -26,7 +26,7 @@ namespace CarRentalApp.Models
         [Required(ErrorMessage = "City cannot be empty!")]
         [StringLength(30)]
         public string City { get; set; } = string.Empty;
-        public string Country { get; set; } = "Polska";
+        public string Country { get; set; } = string.Empty;
         [Required(ErrorMessage = "Email cannot be empty!")]
         [StringLength(50)]
         public string Email { get; set; } = string.Empty;

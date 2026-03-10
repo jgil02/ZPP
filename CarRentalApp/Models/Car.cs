@@ -5,7 +5,7 @@ namespace CarRentalApp.Models
     public class Car
     {
         [Key]
-        public string Vin { get; set; } = string.Empty;
+        public string IdCar { get; set; } = string.Empty; 
         [Required(ErrorMessage = "Brand name cannot be empty!")]
         [StringLength(50)]
         public string Brand { get; set; } = string.Empty;
@@ -16,7 +16,7 @@ namespace CarRentalApp.Models
         public decimal PricePerDay { get; set; }
         [Required(ErrorMessage = "Image path cannot be empty!")]
         public string ImagePath { get; set; } = string.Empty;
-        public int SeatsCount { get; set; }
+        public int SeatsCount { get; set; } public int Seats { get; set; }
         public int DoorsCount { get; set; }
         [Required(ErrorMessage = "Gearbox type name cannot be empty!")]
         [StringLength(30)]
@@ -30,7 +30,7 @@ namespace CarRentalApp.Models
         public int TrunkCapacity { get; set; }
         public double EngineCapacity { get; set; }
 
-        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public virtual ICollection<CarFleet> FleetUnits { get; set; } = new List<CarFleet>();
 
     }
 }
