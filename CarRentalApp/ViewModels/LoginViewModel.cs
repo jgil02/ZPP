@@ -2,11 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Linq;
-using CarRentalApp.Views; 
+using CarRentalApp.Data;
+using CarRentalApp.Models;
+using CarRentalApp.Views;
 
 namespace CarRentalApp.ViewModels
 {
-    
     public partial class LoginViewModel : BaseViewModel
     {
         [ObservableProperty]
@@ -15,34 +16,56 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty]
         private string _errorMessage = "";
 
-       
+        
         [RelayCommand]
         private void Login(object parameter)
         {
-           
+            
             var passwordBox = parameter as System.Windows.Controls.PasswordBox;
             string password = passwordBox?.Password ?? "";
 
+           
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(password))
             {
-                ErrorMessage = "Wpisz login i hasło!";
+                ErrorMessage = "Wprowadź login i hasło!";
                 return;
             }
 
-           
-            
-            if (Username == "admin" && password == "admin")
+            try
             {
-                OpenWorkerPanel();
+                using (var context = new AppDbContext())
+                {
+                  
+                    
+                    var client = context.Clients.FirstOrDefault(c => c.Username == Username && c.Password == password);
+
+                    if (client != null)
+                    {
+                        MessageBox.Show($"Witaj {client.FirstName}! Logowanie pomyślne (Klient).");
+
+                        OpenMainWindow();
+                        return;
+                    }
+
+                    
+                    var worker = context.Workers.FirstOrDefault(w => w.Username == Username && w.Password == password);
+
+                    if (worker != null)
+                    {
+                        MessageBox.Show($"Witaj {worker.FirstName}! Zalogowano jako Pracownik.");
+
+                        OpenMainWindow();
+                        return;
+                    }
+
+                   
+                    ErrorMessage = "Błędny login lub hasło!";
+                }
             }
-            
-            else if (Username == "klient" && password == "klient")
+            catch (System.Exception ex)
             {
-                OpenClientPanel();
-            }
-            else
-            {
-                ErrorMessage = "Błędny login lub hasło!";
+                ErrorMessage = "Błąd połączenia z bazą danych!";
+                MessageBox.Show($"Szczegóły błędu: {ex.Message}");
             }
         }
 
@@ -50,27 +73,20 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void OpenRegistration()
         {
-            
-            var registerWindow = new RegisterView();
-            registerWindow.ShowDialog();
+           
+            var registerView = new RegisterView();
+            registerView.ShowDialog();
         }
 
-        private void OpenWorkerPanel()
+       
+        private void OpenMainWindow()
         {
             var mainView = new MainView();
             mainView.Show();
-            CloseLoginWindow();
-        }
 
-        private void OpenClientPanel()
-        {
-            MessageBox.Show("Witaj");
-            
-        }
-
-        private void CloseLoginWindow()
-        {
-            Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is LoginView)?.Close();
+           
+            var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is LoginView);
+            currentWindow?.Close();
         }
     }
 }

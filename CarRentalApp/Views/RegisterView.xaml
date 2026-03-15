@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:CarRentalApp.ViewModels"
         Title="Wypożyczalnia AutoExpert - Rejestracja" 
-        Height="700" Width="550"
+        Height="750" Width="550"
         WindowStartupLocation="CenterScreen" 
         Background="#2F3542" 
         ResizeMode="NoResize" 
@@ -15,6 +15,7 @@
     </Window.DataContext>
 
     <Grid>
+        
         <Border>
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -26,76 +27,146 @@
 
         
         <Border VerticalAlignment="Center" HorizontalAlignment="Center" 
-                Width="420" Padding="40" Background="White" CornerRadius="20">
+                Width="460" Margin="20" Background="White" CornerRadius="20" Padding="10">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="30" Color="Black" Opacity="0.4" ShadowDepth="0"/>
             </Border.Effect>
 
-            <StackPanel>
-                <TextBlock FontSize="50" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="20">
+                    <TextBlock FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="Nowe Konto" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                    <TextBlock Text="Wybierz typ konta i wypełnij dane" FontSize="13" Foreground="#7F8C8D" HorizontalAlignment="Center" Margin="0,5,0,20"/>
 
-                <TextBlock Text="Nowe Konto" FontSize="28" FontWeight="Bold" 
-                           HorizontalAlignment="Center" Foreground="#2C3E50"/>
-                <TextBlock Text="Dołącz do systemu AutoExpert" FontSize="14" Foreground="#7F8C8D" 
-                           HorizontalAlignment="Center" Margin="0,5,0,30"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,25">
+                        <RadioButton Content="Klient" 
+                                     IsChecked="True" 
+                                     GroupName="RoleGroup"
+                                     Foreground="#34495E" Margin="15,0" FontWeight="Bold" Cursor="Hand"/>
+                        <RadioButton Content="Pracownik" 
+                                     IsChecked="{Binding IsRegisteringAsWorker, Mode=TwoWay}" 
+                                     GroupName="RoleGroup"
+                                     Foreground="#34495E" Margin="15,0" FontWeight="Bold" Cursor="Hand"/>
+                    </StackPanel>
 
-                
-                <TextBlock Text="NAZWA UŻYTKOWNIKA" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,8"/>
-                <Border BorderBrush="#D1D8E0" BorderThickness="1.5" CornerRadius="8" Margin="0,0,0,15">
-                    <TextBox Text="{Binding NewUsername, UpdateSourceTrigger=PropertyChanged}" 
-                             BorderThickness="0" Padding="12,10" Height="40" FontSize="14"
-                             VerticalContentAlignment="Center" Background="Transparent"/>
-                </Border>
+                    
+                    <TextBlock Text="DANE LOGOWANIA" FontSize="12" FontWeight="Bold" Foreground="#2980B9" Margin="0,0,0,10"/>
 
-                
-                <TextBlock Text="HASŁO" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,8"/>
-                <Border BorderBrush="#D1D8E0" BorderThickness="1.5" CornerRadius="8" Margin="0,0,0,20">
-                    <PasswordBox x:Name="RegPasswordBox" 
-                                 BorderThickness="0" Padding="12,10" Height="40" FontSize="14"
-                                 VerticalContentAlignment="Center" Background="Transparent"/>
-                </Border>
+                    <TextBlock Text="NAZWA UŻYTKOWNIKA (LOGIN)" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                        <TextBox Text="{Binding NewUsername, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                    </Border>
 
-                
-                <TextBlock Text="TYP KONTA" FontSize="11" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,8" HorizontalAlignment="Center"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <RadioButton Content="Klient" IsChecked="True" Foreground="#34495E" Margin="10,0" FontWeight="SemiBold" Cursor="Hand"/>
-                    <RadioButton Content="Pracownik" IsChecked="{Binding IsRegisteringAsWorker}" Foreground="#34495E" Margin="10,0" FontWeight="SemiBold" Cursor="Hand"/>
+                    <TextBlock Text="HASŁO" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                        <PasswordBox x:Name="RegPasswordBox" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                    </Border>
+
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,5,0">
+                            <TextBlock Text="IMIĘ" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                                <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Margin="5,0,0,0">
+                            <TextBlock Text="NAZWISKO" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                                <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </UniformGrid>
+
+                    
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRegisteringAsWorker}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="DANE KONTAKTOWE I ADRES" FontSize="12" FontWeight="Bold" Foreground="#2980B9" Margin="0,15,0,10"/>
+
+                        <TextBlock Text="EMAIL" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                            <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="TELEFON" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                            <TextBox Text="{Binding Phone, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="ULICA" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                            <TextBox Text="{Binding Street, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                        </Border>
+
+                        <UniformGrid Columns="3">
+                            <StackPanel Margin="0,0,5,0">
+                                <TextBlock Text="NR DOMU" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                                <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                                    <TextBox Text="{Binding HouseNumber, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="5,0,5,0">
+                                <TextBlock Text="NR LOKALU" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                                <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                                    <TextBox Text="{Binding ApartmentNumber, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Margin="5,0,0,0">
+                                <TextBlock Text="KOD POCZT." FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                                <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                                    <TextBox Text="{Binding PostalCode, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </UniformGrid>
+
+                        <TextBlock Text="MIASTO" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                            <TextBox Text="{Binding City, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+
+                    
+                    <Button Command="{Binding RegisterCommand}" 
+                            CommandParameter="{Binding ElementName=RegPasswordBox}"
+                            Content="UTWÓRZ KONTO" 
+                            Height="50" Cursor="Hand" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0" Margin="0,10,0,0">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#2980B9"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#3498DB"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="Wróć do logowania" 
+                            Background="Transparent" BorderThickness="0" Foreground="#2980B9"
+                            Margin="0,15,0,0" Cursor="Hand" FontWeight="SemiBold" FontSize="12"
+                            Click="BackToLogin_Click"/>
                 </StackPanel>
-
-                
-                <Button Command="{Binding RegisterCommand}" 
-                        CommandParameter="{Binding ElementName=RegPasswordBox}"
-                        Content="UTWÓRZ KONTO" 
-                        Height="50" Cursor="Hand" Foreground="White" FontSize="16" FontWeight="Bold" BorderThickness="0">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="#2980B9"/>
-                            
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#3498DB"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-
-                
-                <Button Content="Masz już konto? Zaloguj się" 
-                        Background="Transparent" BorderThickness="0" Foreground="#2980B9"
-                        Margin="0,20,0,0" Cursor="Hand" FontWeight="SemiBold" FontSize="12"
-                        Click="BackToLogin_Click"/>
-
-            </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>
