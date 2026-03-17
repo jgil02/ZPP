@@ -14,6 +14,8 @@
         <conv:StatusConverter x:Key="StatusConverter"/>
         <conv:StatusColorConverter x:Key="StatusColorConverter"/>
 
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#BDC3C7"/>
@@ -44,14 +46,13 @@
         <vm:MainViewModel />
     </Window.DataContext>
 
-    <!-- podział ekranu -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- sidebar -->
+        
         <Border Grid.Column="0">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -62,42 +63,48 @@
 
             <StackPanel Margin="20">
                 <TextBlock Text="AutoExpert" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
-                <Button Content="Samochody" Style="{StaticResource MenuButtonStyle}"/>
+
+                <Button Content="Samochody" Command="{Binding ShowCarsCommand}" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Klienci" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
+                <Button Content="Historia" Command="{Binding ShowHistoryCommand}" Style="{StaticResource MenuButtonStyle}"/>
+
                 <Separator Background="#34495E" Margin="0,20"/>
                 <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
             </StackPanel>
         </Border>
 
-        <!-- lista -->
+        
         <Grid Grid.Column="1" Margin="30">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-                <TextBlock Text="Lista Samochodów" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" Width="300"/>
+           
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="Lista Samochodów" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" 
+                           Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}"/>
+
+                <TextBlock Text="Twoja Historia Rezerwacji" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" 
+                           Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}">
                 <ItemsControl ItemsSource="{Binding Cars}" Margin="0,10,0,0">
-
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-
-
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Width="350" Height="350" Background="White" CornerRadius="12" Margin="15,15,25,25">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="15" Opacity="0.50" ShadowDepth="6" Direction="315" Color="Black"/>
                                 </Border.Effect>
-
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -105,29 +112,22 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="15,15,15,0">
                                         <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" 
-                                                   Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
                                     </StackPanel>
-
                                     <Image Grid.Row="1" Source="{Binding ImagePath}" Margin="20,10,20,10" Stretch="Uniform"/>
-
                                     <Grid Grid.Row="2" Margin="20,0,20,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-
                                         <TextBlock Grid.Column="0" Text="{Binding FullName}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
-
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding PricePerDay}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
                                             <TextBlock Text=" zł / dzień" FontSize="12" Foreground="#95A5A6" VerticalAlignment="Bottom" Margin="0,0,0,2"/>
                                         </StackPanel>
                                     </Grid>
-
                                     <TextBlock Grid.Row="3" Margin="20,0,20,20" Foreground="#95A5A6" FontSize="13">
                                         <Run Text="{Binding FuelType}"/>
                                         <Run Text=" • "/>
@@ -139,6 +139,97 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
+
+            
+            <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="20"
+                    Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/>
+                </Border.Effect>
+
+                <Grid>
+                    
+                    <DataGrid ItemsSource="{Binding ReservationsHistory}" 
+                              AutoGenerateColumns="False" 
+                              Background="Transparent" 
+                              BorderThickness="0" 
+                              IsReadOnly="True" 
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="#F1F2F6"
+                              FontSize="14"
+                              RowHeight="50"
+                              CanUserAddRows="False"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+                            
+                            <DataGridTextColumn Header="SAMOCHÓD" Binding="{Binding CarName}" Width="2*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="Margin" Value="10,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            
+                            <DataGridTextColumn Header="NUMER VIN" Binding="{Binding Vin}" Width="1.5*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#7F8C8D"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="FontSize" Value="12"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            
+                            <DataGridTextColumn Header="TERMIN WYNAJMU" Binding="{Binding Dates}" Width="2*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                           
+                            <DataGridTextColumn Header="KOSZT CAŁKOWITY" Binding="{Binding TotalPrice, StringFormat={}{0:N2} zł}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="#27AE60"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="Margin" Value="0,0,20,0"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value="#95A5A6"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Padding" Value="10,0,0,10"/>
+                                <Setter Property="FontSize" Value="11"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                    </DataGrid>
+
+                    
+                    <TextBlock Text="Nie masz jeszcze żadnych rezerwacji." 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Foreground="#95A5A6" 
+                               FontSize="16"
+                               Visibility="{Binding ReservationsHistory.Count, Converter={StaticResource StatusColorConverter}, ConverterParameter='Inverted'}">
+                        
+                    </TextBlock>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -42,7 +42,7 @@ namespace CarRentalApp.ViewModels
                     if (client != null)
                     {
                         MessageBox.Show($"Witaj {client.FirstName}! Logowanie pomyślne (Klient).");
-
+                        UserSession.CurrentClient = client;
                         OpenMainWindow();
                         return;
                     }
