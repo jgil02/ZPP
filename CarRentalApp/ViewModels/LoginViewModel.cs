@@ -33,34 +33,32 @@ namespace CarRentalApp.ViewModels
 
             try
             {
-                using (var context = new AppDbContext())
+                using var context = new AppDbContext();
+
+
+                var client = context.Clients.FirstOrDefault(c => c.Username == Username && c.Password == password);
+
+                if (client != null)
                 {
-                  
-                    
-                    var client = context.Clients.FirstOrDefault(c => c.Username == Username && c.Password == password);
-
-                    if (client != null)
-                    {
-                        MessageBox.Show($"Witaj {client.FirstName}! Logowanie pomyślne (Klient).");
-                        UserSession.CurrentClient = client;
-                        OpenMainWindow();
-                        return;
-                    }
-
-                    
-                    var worker = context.Workers.FirstOrDefault(w => w.Username == Username && w.Password == password);
-
-                    if (worker != null)
-                    {
-                        MessageBox.Show($"Witaj {worker.FirstName}! Zalogowano jako Pracownik.");
-
-                        OpenMainWindow();
-                        return;
-                    }
-
-                   
-                    ErrorMessage = "Błędny login lub hasło!";
+                    MessageBox.Show($"Witaj {client.FirstName}! Logowanie pomyślne (Klient).");
+                    UserSession.CurrentClient = client;
+                    OpenMainWindow();
+                    return;
                 }
+
+
+                var worker = context.Workers.FirstOrDefault(w => w.Username == Username && w.Password == password);
+
+                if (worker != null)
+                {
+                    MessageBox.Show($"Witaj {worker.FirstName}! Zalogowano jako Pracownik.");
+                    UserSession.CurrentWorker = worker;
+                    OpenMainWindow();
+                    return;
+                }
+
+
+                ErrorMessage = "Błędny login lub hasło!";
             }
             catch (System.Exception ex)
             {

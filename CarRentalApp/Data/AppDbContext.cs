@@ -153,8 +153,7 @@ namespace CarRentalApp.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // Twój Connection String do bazy danych
-                optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=Wypożyczalnia;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"); // Upewnij się, że ten Connection String jest poprawny i bezpieczny
+                optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=Wypożyczalnia;Integrated Security=True;Encrypt=True;Trust Server Certificate=True"); 
             }
         }
     }

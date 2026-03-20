@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalApp.ViewModels
 {
@@ -18,39 +19,26 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty]
         private bool _isHistoryVisible = false; 
 
-        public ObservableCollection<Car> Cars { get; set; }
-
+        public ObservableCollection<CarFleet> Cars { get; set; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
 
         public MainViewModel()
-        {
-            
-            Cars = new ObservableCollection<Car>
-            {
-                new Car {
-                    Brand = "Audi", Model = "RS5", FuelType = "Benzyna", GearboxType = "Automatyczna",
-                    PricePerDay = 150,
-                    ImagePath = "https://freepngimg.com/thumb/audi/35227-5-audi-rs5-red.png"
-                },
-                new Car {
-                    Brand = "Tesla", Model = "Model S", FuelType = "Elektryczny", GearboxType = "Automatyczna",
-                    PricePerDay = 250,
-                    ImagePath = "https://freepngimg.com/thumb/audi/35227-5-audi-rs5-red.png"
-                },
-                new Car {
-                    Brand = "BMW", Model = "X5", FuelType = "Diesel", GearboxType = "Automatyczna",
-                    PricePerDay = 300,
-                    ImagePath = "https://freepngimg.com/thumb/audi/35227-5-audi-rs5-red.png"
-                },
-                new Car {
-                    Brand = "Mazda", Model = "6", FuelType = "Benzyna", GearboxType = "Manualna",
-                    PricePerDay = 120,
-                    ImagePath = "https://freepngimg.com/thumb/audi/35227-5-audi-rs5-red.png"
-                }
-            };
+        {          
+            LoadCarsFromDatabase();
         }
 
-        
+        private void LoadCarsFromDatabase()
+        {
+            using (var context = new AppDbContext())
+            {
+                var data = context.CarFleets
+                    .Include(c => c.Car)
+                    .ToList();
+
+                Cars = new ObservableCollection<CarFleet>(data);
+            }
+        }
+
         [RelayCommand]
         private void ShowCars()
         {
@@ -102,6 +90,19 @@ namespace CarRentalApp.ViewModels
             
             IsCarsVisible = false;
             IsHistoryVisible = true;
+        }
+
+        [RelayCommand]
+        private void OpenReservation(string vin)
+        {
+
+            var selectedCar = Cars.FirstOrDefault(c => c.Vin == vin);
+
+            if (selectedCar != null)
+            {
+                var reservationView = new Views.ReservationView(selectedCar.Vin);
+                reservationView.ShowDialog();
+            }
         }
 
         [RelayCommand]

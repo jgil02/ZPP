@@ -101,7 +101,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="350" Height="350" Background="White" CornerRadius="12" Margin="15,15,25,25">
+                            <Border Width="350" Height="400" Background="White" CornerRadius="12" Margin="15,15,25,25">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="15" Opacity="0.50" ShadowDepth="6" Direction="315" Color="Black"/>
                                 </Border.Effect>
@@ -109,6 +109,7 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
@@ -122,17 +123,32 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding FullName}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
+                                        <TextBlock Grid.Column="0" Text="{Binding Car.FullName}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding PricePerDay}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
+                                            <TextBlock Text="{Binding Car.PricePerDay}" FontWeight="Bold" FontSize="18" Foreground="#2C3E50"/>
                                             <TextBlock Text=" zł / dzień" FontSize="12" Foreground="#95A5A6" VerticalAlignment="Bottom" Margin="0,0,0,2"/>
                                         </StackPanel>
                                     </Grid>
                                     <TextBlock Grid.Row="3" Margin="20,0,20,20" Foreground="#95A5A6" FontSize="13">
-                                        <Run Text="{Binding FuelType}"/>
+                                        <Run Text="{Binding Car.FuelType}"/>
                                         <Run Text=" • "/>
-                                        <Run Text="{Binding GearboxType}"/>
+                                        <Run Text="{Binding Car.GearboxType}"/>
                                     </TextBlock>
+
+                                    <Button Grid.Row="4" Content="REZERWUJ" 
+                                    Command="{Binding DataContext.OpenReservationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding Vin}"
+                                    Margin="20,0,20,20" Height="40" Background="#34495E" Foreground="White" 
+                                    FontSize="14" FontWeight="Bold" BorderThickness="0">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -219,14 +235,23 @@
                         </DataGrid.ColumnHeaderStyle>
                     </DataGrid>
 
-                    
+
                     <TextBlock Text="Nie masz jeszcze żadnych rezerwacji." 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Foreground="#95A5A6" 
-                               FontSize="16"
-                               Visibility="{Binding ReservationsHistory.Count, Converter={StaticResource StatusColorConverter}, ConverterParameter='Inverted'}">
-                        
+                               FontSize="16">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ReservationsHistory.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
                 </Grid>
             </Border>
