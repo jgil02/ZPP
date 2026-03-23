@@ -2,10 +2,10 @@
 using CarRentalApp.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Diagnostics.Metrics;
-using System.IO;
+using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls; 
 
 namespace CarRentalApp.ViewModels
 {
@@ -13,6 +13,7 @@ namespace CarRentalApp.ViewModels
     {
         
         [ObservableProperty] private string _newUsername = "";
+        [ObservableProperty] private bool _isRegisteringAsWorker;
 
         
         [ObservableProperty] private string _firstName = "";
@@ -27,21 +28,42 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private string _postalCode = "";
         [ObservableProperty] private string _city = "";
         [ObservableProperty] private string _country = "Polska";
-        [ObservableProperty] private bool _isRegisteringAsWorker;
 
         [RelayCommand]
         private void Register(object parameter)
         {
-            var passwordBox = parameter as System.Windows.Controls.PasswordBox;
-            string actualPassword = passwordBox?.Password ?? "";
+            
+
+            
+            var values = parameter as object[];
+            if (values == null || values.Length < 2)
+            {
+                MessageBox.Show("Błąd techniczny: Brak pól haseł.");
+                return;
+            }
+
+            
+            var passBox1 = values[0] as PasswordBox;
+            var passBox2 = values[1] as PasswordBox;
+
+            string actualPassword = passBox1?.Password ?? "";
+            string confirmPassword = passBox2?.Password ?? "";
 
             
             if (string.IsNullOrWhiteSpace(NewUsername) ||
                 string.IsNullOrWhiteSpace(actualPassword) ||
+                string.IsNullOrWhiteSpace(confirmPassword) ||
                 string.IsNullOrWhiteSpace(FirstName) ||
                 string.IsNullOrWhiteSpace(LastName))
             {
                 MessageBox.Show("Podstawowe dane (Login, Hasło, Imię, Nazwisko) są wymagane!");
+                return;
+            }
+
+            
+            if (actualPassword != confirmPassword)
+            {
+                MessageBox.Show("Wprowadzone hasła nie są identyczne! Proszę poprawić błąd.");
                 return;
             }
 
@@ -52,8 +74,6 @@ namespace CarRentalApp.ViewModels
                     if (IsRegisteringAsWorker)
                     {
                         // --- REJESTRACJA PRACOWNIKA ---
-
-                        
                         if (context.Workers.Any(w => w.Username == NewUsername))
                         {
                             MessageBox.Show("Ten login pracownika jest już zajęty!");
@@ -66,7 +86,7 @@ namespace CarRentalApp.ViewModels
                             Password = actualPassword,
                             FirstName = FirstName,
                             LastName = LastName,
-                            Position = "Pracownik" 
+                            Position = "Pracownik"
                         };
 
                         context.Workers.Add(newWorker);
@@ -74,8 +94,6 @@ namespace CarRentalApp.ViewModels
                     else
                     {
                         // --- REJESTRACJA KLIENTA ---
-
-                        
                         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Street) ||
                             string.IsNullOrWhiteSpace(HouseNumber) || string.IsNullOrWhiteSpace(City))
                         {
@@ -108,7 +126,6 @@ namespace CarRentalApp.ViewModels
                         context.Clients.Add(newClient);
                     }
 
-                    
                     context.SaveChanges();
                 }
 
