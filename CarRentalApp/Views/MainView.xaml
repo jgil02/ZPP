@@ -6,14 +6,13 @@
         xmlns:vm="clr-namespace:CarRentalApp.ViewModels"
         xmlns:conv="clr-namespace:CarRentalApp.Converters"
         Title="AutoExpert - Panel Zarządzania" 
-        Height="800" Width="1200"
+        Height="800" Width="1350"
         WindowStartupLocation="CenterScreen"
         Background="#F1F2F6">
 
     <Window.Resources>
         <conv:StatusConverter x:Key="StatusConverter"/>
         <conv:StatusColorConverter x:Key="StatusColorConverter"/>
-
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <Style x:Key="MenuButtonStyle" TargetType="Button">
@@ -48,11 +47,10 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        
         <Border Grid.Column="0">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -63,35 +61,168 @@
 
             <StackPanel Margin="20">
                 <TextBlock Text="AutoExpert" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
-
                 <Button Content="Samochody" Command="{Binding ShowCarsCommand}" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Klienci" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
                 <Button Content="Historia" Command="{Binding ShowHistoryCommand}" Style="{StaticResource MenuButtonStyle}"/>
-
                 <Separator Background="#34495E" Margin="0,20"/>
                 <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
             </StackPanel>
         </Border>
 
-        
         <Grid Grid.Column="1" Margin="30">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-           
-            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
                 <TextBlock Text="Lista Samochodów" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" 
                            Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}"/>
-
                 <TextBlock Text="Twoja Historia Rezerwacji" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" 
                            Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
 
-            
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+            <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="15" Margin="0,0,0,20"
+                    Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2" Direction="270"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Marka pojazdu" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableBrands}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding BrandSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Model" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableModels}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding ModelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Paliwo" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableFuelTypes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding FuelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Nadwozie" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableBodyTypes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding BodySummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Skrzynia" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableGearboxTypes}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding GearboxSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Cena (zł / dzień)" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding PriceFrom, UpdateSourceTrigger=PropertyChanged}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
+                                <TextBlock Text=" - " VerticalAlignment="Center" Margin="2,0,2,0"/>
+                                <TextBox Text="{Binding PriceTo, UpdateSourceTrigger=PropertyChanged}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,10">
+                            <Button Content="Filtruj" Command="{Binding ApplyFiltersCommand}" 
+                                    Background="#34495E" Foreground="White" Width="70" Height="25" Margin="0,0,10,0" FontWeight="SemiBold" BorderThickness="0" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <Button Content="Wyczyść" Command="{Binding ClearFiltersCommand}" 
+                                    Background="#BDC3C7" Foreground="Black" Width="60" Height="25" BorderThickness="0" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right">
+                        <TextBlock Text="Sortuj po" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                        <ComboBox ItemsSource="{Binding SortOptions}" 
+                                  SelectedItem="{Binding SelectedSortOption}" 
+                                  Width="130" Height="24" Cursor="Hand"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                           Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}">
                 <ItemsControl ItemsSource="{Binding Cars}" Margin="0,10,0,0">
                     <ItemsControl.ItemsPanel>
@@ -101,7 +232,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="350" Height="400" Background="White" CornerRadius="12" Margin="15,15,25,25">
+                            <Border Width="350" Height="400" Background="White" CornerRadius="12" Margin="10,10,20,20">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="15" Opacity="0.50" ShadowDepth="6" Direction="315" Color="Black"/>
                                 </Border.Effect>
@@ -117,7 +248,7 @@
                                         <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
                                     </StackPanel>
-                                    <Image Grid.Row="1" Source="{Binding ImagePath}" Margin="20,10,20,10" Stretch="Uniform"/>
+                                    <Image Grid.Row="1" Source="{Binding Car.ImagePath}" Margin="20,10,20,10" Stretch="Uniform"/>
                                     <Grid Grid.Row="2" Margin="20,0,20,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -133,13 +264,15 @@
                                         <Run Text="{Binding Car.FuelType}"/>
                                         <Run Text=" • "/>
                                         <Run Text="{Binding Car.GearboxType}"/>
+                                        <Run Text=" • "/>
+                                        <Run Text="{Binding Car.BodyType}"/>
                                     </TextBlock>
 
                                     <Button Grid.Row="4" Content="REZERWUJ" 
                                     Command="{Binding DataContext.OpenReservationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding Vin}"
                                     Margin="20,0,20,20" Height="40" Background="#34495E" Foreground="White" 
-                                    FontSize="14" FontWeight="Bold" BorderThickness="0">
+                                    FontSize="14" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border Background="{TemplateBinding Background}" CornerRadius="8">
@@ -148,7 +281,6 @@
                                             </ControlTemplate>
                                         </Button.Template>
                                     </Button>
-                                    
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -156,15 +288,14 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            
-            <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="20"
+            <Border Grid.Row="2" Background="White" CornerRadius="12" Padding="20"
                     Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/>
                 </Border.Effect>
 
                 <Grid>
-                    
+
                     <DataGrid ItemsSource="{Binding ReservationsHistory}" 
                               AutoGenerateColumns="False" 
                               Background="Transparent" 
@@ -179,7 +310,7 @@
                               SelectionUnit="FullRow">
 
                         <DataGrid.Columns>
-                            
+
                             <DataGridTextColumn Header="SAMOCHÓD" Binding="{Binding CarName}" Width="2*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -190,7 +321,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            
+
                             <DataGridTextColumn Header="NUMER VIN" Binding="{Binding Vin}" Width="1.5*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -201,7 +332,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            
+
                             <DataGridTextColumn Header="TERMIN WYNAJMU" Binding="{Binding Dates}" Width="2*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -210,7 +341,7 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                           
+
                             <DataGridTextColumn Header="KOSZT CAŁKOWITY" Binding="{Binding TotalPrice, StringFormat={}{0:N2} zł}" Width="*">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -234,8 +365,7 @@
                             </Style>
                         </DataGrid.ColumnHeaderStyle>
                     </DataGrid>
-
-
+                    
                     <TextBlock Text="Nie masz jeszcze żadnych rezerwacji." 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 

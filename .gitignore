@@ -418,3 +418,7 @@ FodyWeavers.xsd
 *.msp
 
 
+/CarRentalApp/Migrations/20260317170504_Jakub.Designer.cs
+/CarRentalApp/Migrations/20260317170504_Jakub.cs
+/.gitignore
+/.gitignore
