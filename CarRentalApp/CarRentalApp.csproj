@@ -10,6 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\AudiA4.png" />
+    <None Remove="Images\AudiRS3.png" />
+    <None Remove="Images\BmwModel3.png" />
+    <None Remove="Images\KiaSportage.png" />
+    <None Remove="Images\SkodaOctavia3.png" />
+    <None Remove="Images\TeslaModel3.png" />
+    <None Remove="Images\ToyotaCorolla.png" />
+    <None Remove="Images\VolvoXC90.png" />
+    <None Remove="Images\VwGolf8.png" />
+    <None Remove="Images\VwPassat9.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.13">
@@ -21,6 +34,19 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\AudiA4.png" />
+    <Resource Include="Images\AudiRS3.png" />
+    <Resource Include="Images\BmwModel3.png" />
+    <Resource Include="Images\KiaSportage.png" />
+    <Resource Include="Images\SkodaOctavia3.png" />
+    <Resource Include="Images\TeslaModel3.png" />
+    <Resource Include="Images\ToyotaCorolla.png" />
+    <Resource Include="Images\VolvoXC90.png" />
+    <Resource Include="Images\VwGolf8.png" />
+    <Resource Include="Images\VwPassat9.png" />
   </ItemGroup>
 
 </Project>

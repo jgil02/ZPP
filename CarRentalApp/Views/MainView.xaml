@@ -248,7 +248,7 @@
                                         <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
                                         <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
                                     </StackPanel>
-                                    <Image Grid.Row="1" Source="{Binding Car.ImagePath}" Margin="20,10,20,10" Stretch="Uniform"/>
+                                    <Image Grid.Row="1" Source="{Binding Car.ImagePath}" Margin="20,10,20,10" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     <Grid Grid.Row="2" Margin="20,0,20,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
