@@ -5,23 +5,24 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls; 
+using System.Windows.Controls;
+using BCrypt.Net; // DODANE: obsługa haszowania
 
 namespace CarRentalApp.ViewModels
 {
     public partial class RegisterViewModel : BaseViewModel
     {
-        
+        // --- DANE KONTA ---
         [ObservableProperty] private string _newUsername = "";
         [ObservableProperty] private bool _isRegisteringAsWorker;
 
-        
+        // --- DANE OSOBOWE ---
         [ObservableProperty] private string _firstName = "";
         [ObservableProperty] private string _lastName = "";
         [ObservableProperty] private string _email = "";
         [ObservableProperty] private string _phone = "";
 
-        
+        // --- ADRES ---
         [ObservableProperty] private string _street = "";
         [ObservableProperty] private string _houseNumber = "";
         [ObservableProperty] private string _apartmentNumber = "";
@@ -32,9 +33,7 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Register(object parameter)
         {
-            
-
-            
+            // 1. Odbieranie danych z MultiBindingu (z RegisterView.xaml)
             var values = parameter as object[];
             if (values == null || values.Length < 2)
             {
@@ -42,14 +41,13 @@ namespace CarRentalApp.ViewModels
                 return;
             }
 
-            
             var passBox1 = values[0] as PasswordBox;
             var passBox2 = values[1] as PasswordBox;
 
             string actualPassword = passBox1?.Password ?? "";
             string confirmPassword = passBox2?.Password ?? "";
 
-            
+            // 2. Walidacja czy pola nie są puste
             if (string.IsNullOrWhiteSpace(NewUsername) ||
                 string.IsNullOrWhiteSpace(actualPassword) ||
                 string.IsNullOrWhiteSpace(confirmPassword) ||
@@ -60,7 +58,7 @@ namespace CarRentalApp.ViewModels
                 return;
             }
 
-            
+            // 3. Sprawdzenie czy hasła są identyczne
             if (actualPassword != confirmPassword)
             {
                 MessageBox.Show("Wprowadzone hasła nie są identyczne! Proszę poprawić błąd.");
@@ -69,6 +67,10 @@ namespace CarRentalApp.ViewModels
 
             try
             {
+                // --- KROK KLUCZOWY: HASZOWANIE HASŁA ---
+                // Generujemy bezpieczny skrót (hash) zamiast zapisywać jawny tekst
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(actualPassword);
+
                 using (var context = new AppDbContext())
                 {
                     if (IsRegisteringAsWorker)
@@ -83,7 +85,7 @@ namespace CarRentalApp.ViewModels
                         var newWorker = new Worker
                         {
                             Username = NewUsername,
-                            Password = actualPassword,
+                            Password = hashedPassword, // ZAPISUJEMY HASH
                             FirstName = FirstName,
                             LastName = LastName,
                             Position = "Pracownik"
@@ -110,7 +112,7 @@ namespace CarRentalApp.ViewModels
                         var newClient = new Client
                         {
                             Username = NewUsername,
-                            Password = actualPassword,
+                            Password = hashedPassword, // ZAPISUJEMY HASH
                             FirstName = FirstName,
                             LastName = LastName,
                             Email = Email,
@@ -130,14 +132,17 @@ namespace CarRentalApp.ViewModels
                 }
 
                 string rola = IsRegisteringAsWorker ? "Pracownik" : "Klient";
-                MessageBox.Show($"Zarejestrowano pomyślnie jako {rola}!");
+                MessageBox.Show($"Zarejestrowano pomyślnie jako {rola}! Twoje hasło zostało zabezpieczone.");
 
-                
+                // Zamknięcie okna rejestracji
                 Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.DataContext == this)?.Close();
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"Błąd bazy danych: {ex.Message}");
+                // Ta linia wyciąga prawdziwą przyczynę z wnętrza błędu
+                string innerError = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
+                MessageBox.Show($"Szczegóły błędu bazy: {innerError}");
             }
         }
     }

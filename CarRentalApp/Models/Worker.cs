@@ -10,7 +10,7 @@ namespace CarRentalApp.Models
         [StringLength(30)]
         public string Username { get; set; } = string.Empty;
         [Required(ErrorMessage = "Password cannot be empty!")]
-        [StringLength(30)]
+        [StringLength(100)]
         public string Password { get; set; } = string.Empty;
         [Required(ErrorMessage = "First name cannot be empty!")]
         [StringLength(50)]
