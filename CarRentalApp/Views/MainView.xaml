@@ -243,6 +243,7 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="15,15,15,0">
                                         <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
@@ -281,6 +282,25 @@
                                             </ControlTemplate>
                                         </Button.Template>
                                     </Button>
+
+                                    <Button Grid.Row="5" Content="SZCZEGÓŁY POJAZDU" 
+                                        Command="{Binding DataContext.ShowCarDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding CarId}" Margin="20,0,20,20" Height="35" Background="Transparent" Foreground="#34495E" 
+                                        FontSize="13" FontWeight="Bold" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="border" Property="Background" Value="#ECF0F1"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+
                                 </Grid>
                             </Border>
                         </DataTemplate>

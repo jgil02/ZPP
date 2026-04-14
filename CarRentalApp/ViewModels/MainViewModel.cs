@@ -241,5 +241,15 @@ namespace CarRentalApp.ViewModels
             public string Dates { get; set; } = string.Empty;
             public decimal TotalPrice { get; set; }
         }
+
+        [RelayCommand]
+        private void ShowCarDetails(string carId)
+        {
+            if (!string.IsNullOrEmpty(carId))
+            {
+                var detailsView = new Views.CarDetailsView(carId);
+                detailsView.ShowDialog();
+            }
+        }
     }
 }
