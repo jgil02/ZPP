@@ -238,9 +238,11 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Logout()
         {
+            var oldWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView)
+                 ?? Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
             var loginView = new Views.LoginView();
             loginView.Show();
-            Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView)?.Close();
+            oldWindow?.Close();
         }
 
         public class ReservationHistoryItem
