@@ -50,21 +50,51 @@
             <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
+        <!-- SIDEBAR -->
+            <Border Grid.Column="0">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                <GradientStop Color="#2C3E50" Offset="0"/>
+                                <GradientStop Color="#000000" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsWorker}" Value="True">
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                        <GradientStop Color="#922B21" Offset="0"/>
 
-        <Border Grid.Column="0">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="#2C3E50" Offset="0"/>
-                    <GradientStop Color="#000000" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+                                        <GradientStop Color="#000000" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
 
             <StackPanel Margin="20">
                 <TextBlock Text="AutoExpert" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
-                <Button Content="Samochody" Command="{Binding ShowCarsCommand}" Style="{StaticResource MenuButtonStyle}"/>
-                <Button Content="Klienci" Style="{StaticResource MenuButtonStyle}"/>
-                <Button Content="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
-                <Button Content="Historia" Command="{Binding ShowHistoryCommand}" Style="{StaticResource MenuButtonStyle}"/>
+                <!-- 2. MENU KLIENTA -->
+                <StackPanel Visibility="{Binding IsClient, Converter={StaticResource BoolToVis}}">
+                    <Button Content="Samochody" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Moje Rezerwacje" Command="{Binding NavigateCommand}" CommandParameter="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
+                </StackPanel>
+
+                <!-- 3. MENU PRACOWNIKA -->
+                <StackPanel Visibility="{Binding IsWorker, Converter={StaticResource BoolToVis}}">
+                    <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Zarządzaj Rezerwacjami" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Klienci" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Dodaj Auto" Command="{Binding NavigateCommand}" CommandParameter="DodajAuto" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Dodaj Klienta" Command="{Binding NavigateCommand}" CommandParameter="DodajKlienta" Style="{StaticResource MenuButtonStyle}"/>
+                </StackPanel>
                 <Separator Background="#34495E" Margin="0,20"/>
                 <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
             </StackPanel>

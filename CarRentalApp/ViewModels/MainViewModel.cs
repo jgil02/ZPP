@@ -21,6 +21,12 @@ namespace CarRentalApp.ViewModels
 
         private List<CarFleet> _allCars = new();
 
+        [ObservableProperty]
+        private bool _isClient;
+
+        [ObservableProperty]
+        private bool _isWorker;
+
         public ObservableCollection<CarFleet> Cars { get; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
 
@@ -56,6 +62,9 @@ namespace CarRentalApp.ViewModels
 
         public MainViewModel()
         {
+            IsClient = UserSession.CurrentClient != null;
+            IsWorker = UserSession.CurrentWorker != null;
+
             LoadCarsFromDatabase();
         }
 
