@@ -39,6 +39,32 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="MenuButtonStyleWorker" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#BDC3C7"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" Margin="15,0,0,0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#a82e22"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
     </Window.Resources>
 
     <Window.DataContext>
@@ -85,18 +111,20 @@
                 <StackPanel Visibility="{Binding IsClient, Converter={StaticResource BoolToVis}}">
                     <Button Content="Samochody" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyle}"/>
                     <Button Content="Moje Rezerwacje" Command="{Binding NavigateCommand}" CommandParameter="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
+                    <Separator Background="#34495E" Margin="0,20"/>
+                    <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyleWorker}"/>
                 </StackPanel>
 
                 <!-- 3. MENU PRACOWNIKA -->
                 <StackPanel Visibility="{Binding IsWorker, Converter={StaticResource BoolToVis}}">
-                    <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyle}"/>
-                    <Button Content="Zarządzaj Rezerwacjami" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyle}"/>
-                    <Button Content="Klienci" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyle}"/>
-                    <Button Content="Dodaj Auto" Command="{Binding NavigateCommand}" CommandParameter="DodajAuto" Style="{StaticResource MenuButtonStyle}"/>
-                    <Button Content="Dodaj Klienta" Command="{Binding NavigateCommand}" CommandParameter="DodajKlienta" Style="{StaticResource MenuButtonStyle}"/>
+                    <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Zarządzaj Rezerwacjami" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Klienci" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Dodaj Auto" Command="{Binding NavigateCommand}" CommandParameter="DodajAuto" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Dodaj Klienta" Command="{Binding NavigateCommand}" CommandParameter="DodajKlienta" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Separator Background="#34495E" Margin="0,20"/>
+                    <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyleWorker}"/>
                 </StackPanel>
-                <Separator Background="#34495E" Margin="0,20"/>
-                <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
             </StackPanel>
         </Border>
 
