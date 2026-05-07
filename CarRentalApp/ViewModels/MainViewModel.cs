@@ -238,10 +238,15 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Logout()
         {
+            UserSession.CurrentClient = null;
+            UserSession.CurrentWorker = null;
+
             var oldWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView)
                  ?? Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+           
             var loginView = new Views.LoginView();
             loginView.Show();
+            
             oldWindow?.Close();
         }
 

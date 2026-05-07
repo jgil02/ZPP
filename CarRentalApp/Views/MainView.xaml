@@ -107,15 +107,15 @@
 
             <StackPanel Margin="20">
                 <TextBlock Text="AutoExpert" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,0,0,40" HorizontalAlignment="Center"/>
-                <!-- 2. MENU KLIENTA -->
+                <!-- MENU KLIENTA -->
                 <StackPanel Visibility="{Binding IsClient, Converter={StaticResource BoolToVis}}">
                     <Button Content="Samochody" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyle}"/>
                     <Button Content="Moje Rezerwacje" Command="{Binding NavigateCommand}" CommandParameter="Rezerwacje" Style="{StaticResource MenuButtonStyle}"/>
                     <Separator Background="#34495E" Margin="0,20"/>
-                    <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Wyloguj" Command="{Binding LogoutCommand}" Style="{StaticResource MenuButtonStyle}"/>
                 </StackPanel>
 
-                <!-- 3. MENU PRACOWNIKA -->
+                <!-- MENU PRACOWNIKA -->
                 <StackPanel Visibility="{Binding IsWorker, Converter={StaticResource BoolToVis}}">
                     <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Zarządzaj Rezerwacjami" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyleWorker}"/>
