@@ -55,7 +55,25 @@
                                      Foreground="#34495E" Margin="15,0" FontWeight="Bold" Cursor="Hand"/>
                     </StackPanel>
 
-                    
+                    <StackPanel Margin="0,0,0,10">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRegisteringAsWorker}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Kod dostępu" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>
+                        <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,10">
+                            <TextBox x:Name="WorkerAccessCodeBox" Text="{Binding WorkerAccessCode, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Padding="8,5" Height="35" VerticalContentAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+
+
                     <TextBlock Text="DANE LOGOWANIA" FontSize="12" FontWeight="Bold" Foreground="#2980B9" Margin="0,0,0,10"/>
 
                     <TextBlock Text="NAZWA UŻYTKOWNIKA (LOGIN)" FontSize="10" FontWeight="Bold" Foreground="#34495E" Margin="0,0,0,5"/>

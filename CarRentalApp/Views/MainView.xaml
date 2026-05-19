@@ -248,7 +248,23 @@
                                 <TextBox Text="{Binding PriceTo, UpdateSourceTrigger=PropertyChanged}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
                             </StackPanel>
                         </StackPanel>
-                        <!-- Przyciski akcji filtrów -->
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Status" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableStatuses}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,10">
                             <Button Content="Filtruj" Command="{Binding ApplyFiltersCommand}" Background="#34495E" Foreground="White" Width="70" Height="25" Margin="0,0,10,0" Cursor="Hand"/>
                             <Button Content="Wyczyść" Command="{Binding ClearFiltersCommand}" Background="#BDC3C7" Foreground="Black" Width="60" Height="25" Cursor="Hand"/>

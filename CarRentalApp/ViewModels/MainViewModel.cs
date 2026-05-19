@@ -8,18 +8,24 @@ using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System;
 
 namespace CarRentalApp.ViewModels
 {
     public partial class MainViewModel : BaseViewModel
     {
+        [ObservableProperty]
+        private bool _isCarsVisible = true; [ObservableProperty]
+        private bool _isHistoryVisible = false;
         
         [ObservableProperty]
-        private object? _currentView; // Tu lądują ViewModele nowych widoków (np. AddClientViewModel)
+        private object? _currentView;
+        [ObservableProperty]
+        private bool _isHistoryVisible = false;
 
         [ObservableProperty] private bool _isCarsVisible = true;
         [ObservableProperty] private bool _isHistoryVisible = false;
-        [ObservableProperty] private bool _isModuleVisible = false; // Widoczność dla nowych modułów
+        [ObservableProperty] private bool _isModuleVisible = false;
 
         private List<CarFleet> _allCars = new();
 
@@ -40,13 +46,14 @@ namespace CarRentalApp.ViewModels
         public ObservableCollection<FilterItem> AvailableFuelTypes { get; } = new();
         public ObservableCollection<FilterItem> AvailableBodyTypes { get; } = new();
         public ObservableCollection<FilterItem> AvailableGearboxTypes { get; } = new();
+        public ObservableCollection<FilterItem> AvailableStatuses { get; } = new();
 
         [ObservableProperty] private string _brandSummary = "Wszystkie";
         [ObservableProperty] private string _modelSummary = "Wszystkie";
         [ObservableProperty] private string _segmentSummary = "Wszystkie";
-        [ObservableProperty] private string _fuelSummary = "Wszystkie";
-        [ObservableProperty] private string _bodySummary = "Wszystkie";
+        [ObservableProperty] private string _fuelSummary = "Wszystkie"; [ObservableProperty] private string _bodySummary = "Wszystkie";
         [ObservableProperty] private string _gearboxSummary = "Wszystkie";
+        [ObservableProperty] private string _statusSummary = "Wszystkie";
 
         [ObservableProperty] private decimal? _priceFrom;
         [ObservableProperty] private decimal? _priceTo;
@@ -107,7 +114,19 @@ namespace CarRentalApp.ViewModels
         {
             using (var context = new AppDbContext())
             {
-                var data = context.CarFleets.Include(c => c.Car).ToList();
+                var data = context.CarFleets
+                    .Include(c => c.Car)
+                    .Include(c => c.Reservations)
+                    .ToList();
+
+                DateTime today = DateTime.Now.Date;
+
+                foreach (var fleet in data)
+                {
+                    bool isRentedRightNow = fleet.Reservations.Any(r => today >= r.StartDate && today <= r.EndDate);
+                    fleet.IsAvailable = !isRentedRightNow;
+                }
+
                 _allCars = data;
                 Cars.Clear();
                 foreach (var item in data) Cars.Add(item);
@@ -121,8 +140,19 @@ namespace CarRentalApp.ViewModels
             PopulateFilterList(AvailableModels, _allCars.Select(c => c.Car.Model));
             PopulateFilterList(AvailableSegments, _allCars.Select(c => c.Car.Segment));
             PopulateFilterList(AvailableFuelTypes, _allCars.Select(c => c.Car.FuelType));
-            PopulateFilterList(AvailableBodyTypes, _allCars.Select(c => c.Car.BodyType));
+
+            AvailableStatuses.Clear();
+            var dostepnyItem = new FilterItem { Name = "Dostępny" };
+            var wypozyczonyItem = new FilterItem { Name = "Wypożyczony" };
+
+            dostepnyItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
+            wypozyczonyItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
+
+            AvailableStatuses.Add(dostepnyItem);
+            AvailableStatuses.Add(wypozyczonyItem);
+
             PopulateFilterList(AvailableGearboxTypes, _allCars.Select(c => c.Car.GearboxType));
+
             UpdateSummaries();
         }
 
@@ -145,6 +175,7 @@ namespace CarRentalApp.ViewModels
             FuelSummary = GetSummaryText(AvailableFuelTypes);
             BodySummary = GetSummaryText(AvailableBodyTypes);
             GearboxSummary = GetSummaryText(AvailableGearboxTypes);
+            StatusSummary = GetSummaryText(AvailableStatuses);
         }
 
         private string GetSummaryText(ObservableCollection<FilterItem> collection)
@@ -154,7 +185,6 @@ namespace CarRentalApp.ViewModels
             if (selectedCount == 1) return collection.First(x => x.IsSelected).Name;
             return $"{selectedCount} wybrane";
         }
-
         [RelayCommand]
         private void ApplyFilters()
         {
@@ -164,6 +194,7 @@ namespace CarRentalApp.ViewModels
             var selectedFuels = AvailableFuelTypes.Where(x => x.IsSelected).Select(x => x.Name).ToList();
             var selectedBodies = AvailableBodyTypes.Where(x => x.IsSelected).Select(x => x.Name).ToList();
             var selectedGearboxes = AvailableGearboxTypes.Where(x => x.IsSelected).Select(x => x.Name).ToList();
+            var selectedStatuses = AvailableStatuses.Where(x => x.IsSelected).Select(x => x.Name).ToList();
 
             var filtered = _allCars.AsEnumerable();
 
@@ -173,6 +204,14 @@ namespace CarRentalApp.ViewModels
             if (selectedFuels.Any()) filtered = filtered.Where(c => selectedFuels.Contains(c.Car.FuelType));
             if (selectedBodies.Any()) filtered = filtered.Where(c => selectedBodies.Contains(c.Car.BodyType));
             if (selectedGearboxes.Any()) filtered = filtered.Where(c => selectedGearboxes.Contains(c.Car.GearboxType));
+
+            if (selectedStatuses.Count == 1)
+            {
+                if (selectedStatuses.Contains("Dostępny"))
+                    filtered = filtered.Where(c => c.IsAvailable);
+                else if (selectedStatuses.Contains("Wypożyczony"))
+                    filtered = filtered.Where(c => !c.IsAvailable);
+            }
 
             if (PriceFrom.HasValue) filtered = filtered.Where(c => c.Car.PricePerDay >= PriceFrom.Value);
             if (PriceTo.HasValue) filtered = filtered.Where(c => c.Car.PricePerDay <= PriceTo.Value);
@@ -197,14 +236,17 @@ namespace CarRentalApp.ViewModels
             foreach (var b in AvailableModels) b.IsSelected = false;
             foreach (var b in AvailableSegments) b.IsSelected = false;
             foreach (var b in AvailableFuelTypes) b.IsSelected = false;
-            foreach (var b in AvailableBodyTypes) b.IsSelected = false;
-            foreach (var b in AvailableGearboxTypes) b.IsSelected = false;
-            PriceFrom = null; PriceTo = null;
+            foreach (var b in AvailableStatuses) b.IsSelected = false;
+
+            PriceFrom = null;
+            PriceTo = null;
+
+            PriceTo = null;
+
             if (SelectedSortOption != "Nazwa (A-Z)") SelectedSortOption = "Nazwa (A-Z)";
             else ApplyFilters();
             UpdateSummaries();
         }
-
         [RelayCommand]
         private void ShowCars() => Navigate("Samochody");
 

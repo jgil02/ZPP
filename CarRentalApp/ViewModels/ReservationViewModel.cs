@@ -30,7 +30,6 @@ namespace CarRentalApp.ViewModels
         {
             CarVin = vin;
 
-
             var carFleet = _context.CarFleets.Include(c => c.Car).FirstOrDefault(c => c.Vin == vin);
             if (carFleet != null)
             {
@@ -38,17 +37,17 @@ namespace CarRentalApp.ViewModels
                 CarFullName = $"{carFleet.Car.Brand} {carFleet.Car.Model}";
             }
 
-            CalculatePrice(); 
+            CalculatePrice();
         }
-
 
         partial void OnStartDateChanged(DateTime value) => CalculatePrice();
         partial void OnEndDateChanged(DateTime value) => CalculatePrice();
 
         private void CalculatePrice()
         {
-            int days = (EndDate - StartDate).Days;
-            if (days < 1) days = 1; 
+            int days = (EndDate.Date - StartDate.Date).Days + 1;
+
+            if (days < 1) days = 1;
 
             TotalPrice = days * _pricePerDay;
         }
@@ -56,13 +55,11 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void ConfirmReservation(Window window)
         {
-
             if (UserSession.CurrentClient == null && UserSession.CurrentWorker == null)
             {
                 MessageBox.Show("Błąd sesji: Nie jesteś zalogowany!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
 
             if (StartDate.Date < DateTime.Now.Date)
             {
@@ -70,25 +67,24 @@ namespace CarRentalApp.ViewModels
                 return;
             }
 
-            if (EndDate <= StartDate)
+            if (EndDate.Date < StartDate.Date)
             {
-                MessageBox.Show("Data zwrotu musi być późniejsza niż data odbioru!", "Błąd daty", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Data zwrotu nie może być wcześniejsza niż data odbioru!", "Błąd daty", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
-
                 bool isAlreadyReserved = _context.Reservations.Any(r =>
                     r.CarVin == CarVin &&
-                    StartDate < r.EndDate &&
-                    EndDate > r.StartDate);
+                    StartDate.Date <= r.EndDate.Date &&
+                    EndDate.Date >= r.StartDate.Date);
 
                 if (isAlreadyReserved)
                 {
                     MessageBox.Show("Niestety, to auto jest już zarezerwowane w wybranym terminie. Wybierz inne daty.",
                                     "Brak dostępności", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return; 
+                    return;
                 }
 
                 var reservation = new Reservation
@@ -96,8 +92,8 @@ namespace CarRentalApp.ViewModels
                     CarVin = CarVin,
                     ClientId = UserSession.CurrentClient?.ClientID ?? 1,
                     WorkerId = UserSession.CurrentWorker?.WorkerID ?? 1,
-                    StartDate = StartDate,
-                    EndDate = EndDate,
+                    StartDate = StartDate.Date,
+                    EndDate = EndDate.Date,
                     TotalPrice = TotalPrice
                 };
 
