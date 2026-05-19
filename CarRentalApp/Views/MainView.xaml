@@ -374,15 +374,88 @@
                 </Border>
 
                 <!-- 2. HISTORIA -->
-                <Border Background="White" CornerRadius="12" Padding="20" Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">
-                    <DataGrid ItemsSource="{Binding ReservationsHistory}" AutoGenerateColumns="False" Background="Transparent" BorderThickness="0" IsReadOnly="True" HeadersVisibility="Column" RowHeight="50">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="SAMOCHÓD" Binding="{Binding CarName}" Width="2*"/>
-                            <DataGridTextColumn Header="NUMER VIN" Binding="{Binding Vin}" Width="1.5*"/>
-                            <DataGridTextColumn Header="TERMIN" Binding="{Binding Dates}" Width="2*"/>
-                            <DataGridTextColumn Header="KOSZT" Binding="{Binding TotalPrice, StringFormat={}{0:N2} zł}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                <Border Background="Transparent" Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            
+                            <RowDefinition Height="*"/>
+                            
+                        </Grid.RowDefinitions>
+
+                        
+                        <Border Grid.Row="0" Background="White" CornerRadius="10" Padding="15,10" Margin="0,0,0,15">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Liczba Twoich rezerwacji: " Foreground="Gray" FontSize="14"/>
+                                <TextBlock Text="{Binding ReservationsHistory.Count}" FontWeight="Bold" Foreground="#2980B9" FontSize="14"/>
+                            </StackPanel>
+                        </Border>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding ReservationsHistory}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="White" CornerRadius="12" Margin="0,0,5,15" Padding="25,20">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2" Direction="270"/>
+                                            </Border.Effect>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    
+                                                </Grid.ColumnDefinitions>
+
+                                                
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding CarName}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                                        <TextBlock Text="Numer VIN: " FontSize="12" Foreground="Gray"/>
+                                                        <TextBlock Text="{Binding Vin}" FontSize="12" Foreground="#2980B9" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+
+                                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                                        <TextBlock Text="Okres wynajmu: " FontSize="13" Foreground="#7F8C8D"/>
+                                                        <TextBlock Text="{Binding Dates}" FontSize="13" Foreground="#34495E" FontWeight="Medium"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                    <TextBlock Text="KOSZT CAŁKOWITY" FontSize="10" FontWeight="Bold" Foreground="#BDC3C7" HorizontalAlignment="Right"/>
+                                                    <TextBlock Text="{Binding TotalPrice, StringFormat={}{0:N2} zł}" 
+                                               FontSize="22" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Right"/>
+
+                                                    <Border Background="#EBF5FB" CornerRadius="4" Padding="10,4" Margin="0,12,0,0" HorizontalAlignment="Right">
+                                                        <TextBlock Text="POTWIERDZONA" FontSize="10" FontWeight="Bold" Foreground="#2980B9"/>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        
+                        <TextBlock Grid.Row="1" Text="Nie masz jeszcze żadnych rezerwacji." 
+                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   Foreground="#95A5A6" FontSize="16">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ReservationsHistory.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </Border>
 
                 <!-- 3. MODUŁY (np. Dodaj Klienta) -->
