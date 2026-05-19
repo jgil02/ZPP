@@ -26,7 +26,10 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private bool _isClient;
         [ObservableProperty] private bool _isWorker;
 
-        
+        [ObservableProperty] private bool _isComparePanelVisible;
+        [ObservableProperty] private bool _isCompareListExpanded;
+        public ObservableCollection<CarFleet> CompareQueue { get; } = new();
+
         public ObservableCollection<CarFleet> Cars { get; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
 
@@ -180,8 +183,12 @@ namespace CarRentalApp.ViewModels
             else if (SelectedSortOption == "Cena (malejąco)") filtered = filtered.OrderByDescending(c => c.Car.PricePerDay);
 
             Cars.Clear();
-            foreach (var item in filtered) Cars.Add(item);
-        }
+            foreach (var item in filtered)
+            {
+                item.IsSelectedForCompare = CompareQueue.Any(q => q.Vin == item.Vin);
+                Cars.Add(item);
+                }
+            }
 
         [RelayCommand]
         private void ClearFilters()
@@ -260,5 +267,38 @@ namespace CarRentalApp.ViewModels
             public string Dates { get; set; } = string.Empty;
             public decimal TotalPrice { get; set; }
         }
+
+        [RelayCommand]
+        private void ToggleCompare(CarFleet car)
+        {
+            if (car == null) return;
+
+            if (car.IsSelectedForCompare)
+            {
+                var inQueue = CompareQueue.FirstOrDefault(q => q.Vin == car.Vin);
+                if (inQueue != null) CompareQueue.Remove(inQueue);
+                car.IsSelectedForCompare = false;
+            }
+            else
+            {
+                if (CompareQueue.Count >= 3) { MessageBox.Show("Max 3 auta!"); return; }
+                CompareQueue.Add(car);
+                car.IsSelectedForCompare = true;
+            }
+            IsComparePanelVisible = CompareQueue.Count > 0;
+            if (CompareQueue.Count == 0) IsCompareListExpanded = false;
+        }
+
+        [RelayCommand]
+        private void ToggleCompareList() => IsCompareListExpanded = !IsCompareListExpanded;
+
+        [RelayCommand]
+        private void OpenCompare()
+        {
+            if (CompareQueue.Count < 2) { MessageBox.Show("Wybierz min. 2 auta."); return; }
+            var ids = CompareQueue.Select(q => q.CarId).Distinct().ToList();
+            new Views.CompareView(ids).ShowDialog();
+        }
+
     }
 }

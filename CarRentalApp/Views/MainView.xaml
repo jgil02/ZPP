@@ -287,10 +287,33 @@
                                             <RowDefinition Height="Auto"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
-                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="15,15,15,0">
-                                            <Ellipse Width="20" Height="20" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
-                                            <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="15" FontWeight="Bold"/>
-                                        </StackPanel>
+
+                                        <Grid Grid.Row="0" Margin="15,15,15,0">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                                <Ellipse Width="15" Height="15" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="14" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <Button HorizontalAlignment="Right" 
+                                                    Command="{Binding DataContext.ToggleCompareCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0" Cursor="Hand">
+                                                <TextBlock FontSize="13" FontWeight="Bold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="Porównaj"/>
+                                                            <Setter Property="Foreground" Value="purple"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsSelectedForCompare}" Value="True">
+                                                                    <Setter Property="Text" Value="✅ Dodane"/>
+                                                                    <Setter Property="Foreground" Value="#27AE60"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Button>
+                                        </Grid>
+
                                         <Image Grid.Row="1" Source="{Binding Car.ImagePath}" Margin="20,10,20,10" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                                         <Grid Grid.Row="2" Margin="20,0,20,5">
                                             <Grid.ColumnDefinitions>
@@ -312,6 +335,43 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
+                <!-- PANEL PORÓWNYWARKI -->
+                <Border Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-180,180,0" Background="#2C3E50" CornerRadius="15" Padding="15" Width="280" Visibility="{Binding IsComparePanelVisible, Converter={StaticResource BoolToVis}}" Panel.ZIndex="100">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" Opacity="0.5" ShadowDepth="5" Direction="270"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <Button Command="{Binding ToggleCompareListCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding CompareQueue.Count, StringFormat='Porównywarka ({0}/3)'}" Foreground="White" FontWeight="Bold" Margin="10,0" FontSize="18"/>
+                                <TextBlock Grid.Column="2" Text="↕" Foreground="#BDC3C7"/>
+                            </Grid>
+                        </Button>
+                        <StackPanel Visibility="{Binding IsCompareListExpanded, Converter={StaticResource BoolToVis}}" Margin="0,15,0,0">
+                            <ItemsControl ItemsSource="{Binding CompareQueue}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Car.FullName}" Foreground="White" FontSize="13" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Content="✕" Command="{Binding DataContext.ToggleCompareCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Background="Transparent" Foreground="#E74C3C" BorderThickness="0" Cursor="Hand"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Content="POTWIERDŹ PORÓWNANIE" Command="{Binding OpenCompareCommand}" Background="#27AE60" Foreground="White" FontWeight="Bold" Padding="10" Margin="0,10,0,0" BorderThickness="0" Cursor="Hand"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
 
                 <!-- 2. HISTORIA -->
                 <Border Background="White" CornerRadius="12" Padding="20" Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}">

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarRentalApp.Models
 {
@@ -32,6 +33,9 @@ namespace CarRentalApp.Models
         public double EngineCapacity { get; set; }
 
         public virtual ICollection<CarFleet> FleetUnits { get; set; } = new List<CarFleet>();
+
+        [NotMapped]
+        public bool IsSelectedForCompare { get; set; }
 
     }
 }
