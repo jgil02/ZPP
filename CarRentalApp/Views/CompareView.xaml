@@ -1,0 +1,72 @@
+﻿<Window x:Class="CarRentalApp.Views.CompareView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Porównanie Modeli" Height="650" Width="950" 
+        WindowStartupLocation="CenterScreen" 
+        Background="#F1F2F6">
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Zestawienie parametrów" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+            <TextBlock Text="Kolorem zielonym oznaczono najlepsze wyniki w danej kategorii" Foreground="#95A5A6" HorizontalAlignment="Center" FontSize="12"/>
+        </StackPanel>
+
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding CarsToCompare}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="1"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White" CornerRadius="15" Margin="10" Padding="20">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="15" Opacity="0.1" ShadowDepth="3"/>
+                        </Border.Effect>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <Image Source="{Binding Car.ImagePath}" Height="120" Stretch="Uniform" Margin="0,0,0,10"/>
+                                <TextBlock Text="{Binding Car.FullName}" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,20"/>
+
+                                <Separator Background="#ECF0F1" Margin="0,0,0,15"/>
+
+                                <TextBlock Text="Cena za dobę:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.PricePerDay, StringFormat={}{0} zł}" Foreground="{Binding PriceColor}" FontWeight="Bold" FontSize="18" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Pojemność silnika:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.EngineCapacity, StringFormat={}{0:F1} L}" Foreground="{Binding EngineColor}" FontWeight="Bold" FontSize="18" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Pojemność bagażnika:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.TrunkCapacity, StringFormat={}{0} l}" Foreground="{Binding TrunkColor}" FontWeight="Bold" FontSize="18" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Ilość drzwi:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.DoorsCount}" Foreground="{Binding DoorsColor}" FontWeight="Bold" FontSize="18" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Ilość miejsc:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.SeatsCount}" Foreground="{Binding SeatsColor}" FontWeight="Bold" FontSize="18" Margin="0,0,0,15"/>
+
+                                <Separator Background="#ECF0F1" Margin="0,0,0,15"/>
+
+                                <TextBlock Text="Skrzynia biegów:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.GearboxType}" Foreground="#2C3E50" FontWeight="SemiBold" FontSize="15" Margin="0,0,0,12"/>
+
+                                <TextBlock Text="Rodzaj paliwa:" Foreground="#95A5A6" FontSize="11"/>
+                                <TextBlock Text="{Binding Car.FuelType}" Foreground="#2C3E50" FontWeight="SemiBold" FontSize="15"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</Window>

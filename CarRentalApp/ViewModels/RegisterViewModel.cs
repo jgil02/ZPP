@@ -12,6 +12,10 @@ namespace CarRentalApp.ViewModels
 {
     public partial class RegisterViewModel : BaseViewModel
     {
+        // --- HARDCODED KOD DOSTĘPU PRACOWNIKA ---
+        private const string SecretWorkerAccessCode = "TwojeTajnyKodPracownika25X";
+
+        [ObservableProperty] private string _workerAccessCode = "";
         // --- DANE KONTA ---
         [ObservableProperty] private string _newUsername = "";
         [ObservableProperty] private bool _isRegisteringAsWorker;
@@ -76,6 +80,17 @@ namespace CarRentalApp.ViewModels
                     if (IsRegisteringAsWorker)
                     {
                         // --- REJESTRACJA PRACOWNIKA ---
+                        if (string.IsNullOrWhiteSpace(WorkerAccessCode))
+                        {
+                            MessageBox.Show("Wymagany jest kod dostępu pracownika!");
+                            return;
+                        }
+                        if (WorkerAccessCode != SecretWorkerAccessCode)
+                        {
+                            MessageBox.Show("Niepoprawny kod dostępu pracownika! Nie masz uprawnień do utworzenia tego konta.");
+                            return;
+                        }
+
                         if (context.Workers.Any(w => w.Username == NewUsername))
                         {
                             MessageBox.Show("Ten login pracownika jest już zajęty!");

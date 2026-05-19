@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CarRentalApp.Models
 {
-    public class CarFleet
+    public partial class CarFleet : ObservableObject
     {
         [Key]
         [StringLength(17)]
@@ -26,6 +27,14 @@ namespace CarRentalApp.Models
         public virtual Car Car { get; set; } = null!;
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
+
+        private bool _isSelectedForCompare;
+        [NotMapped]
+        public bool IsSelectedForCompare
+        {
+            get => _isSelectedForCompare;
+            set => SetProperty(ref _isSelectedForCompare, value);
+        }
     }
 
 }

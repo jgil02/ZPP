@@ -17,18 +17,29 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty]
         private bool _isCarsVisible = true; [ObservableProperty]
         private bool _isHistoryVisible = false;
+        
+        [ObservableProperty]
+        private object? _currentView;
+        [ObservableProperty]
+        private bool _isHistoryVisible = false;
+
+        [ObservableProperty] private bool _isCarsVisible = true;
+        [ObservableProperty] private bool _isHistoryVisible = false;
+        [ObservableProperty] private bool _isModuleVisible = false;
 
         private List<CarFleet> _allCars = new();
 
-        [ObservableProperty]
-        private bool _isClient;
+        [ObservableProperty] private bool _isClient;
+        [ObservableProperty] private bool _isWorker;
 
-        [ObservableProperty]
-        private bool _isWorker;
+        [ObservableProperty] private bool _isComparePanelVisible;
+        [ObservableProperty] private bool _isCompareListExpanded;
+        public ObservableCollection<CarFleet> CompareQueue { get; } = new();
 
         public ObservableCollection<CarFleet> Cars { get; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
 
+        
         public ObservableCollection<FilterItem> AvailableBrands { get; } = new();
         public ObservableCollection<FilterItem> AvailableModels { get; } = new();
         public ObservableCollection<FilterItem> AvailableSegments { get; } = new();
@@ -52,14 +63,11 @@ namespace CarRentalApp.ViewModels
             "Nazwa (A-Z)", "Nazwa (Z-A)", "Cena (rosnąco)", "Cena (malejąco)"
         };
 
-        [ObservableProperty]
-        private string _selectedSortOption = "Nazwa (A-Z)";
+        [ObservableProperty] private string _selectedSortOption = "Nazwa (A-Z)";
 
-        partial void OnSelectedSortOptionChanged(string value)
-        {
-            ApplyFilters();
-        }
+        partial void OnSelectedSortOptionChanged(string value) => ApplyFilters();
 
+        
         public MainViewModel()
         {
             IsClient = UserSession.CurrentClient != null;
@@ -68,6 +76,40 @@ namespace CarRentalApp.ViewModels
             LoadCarsFromDatabase();
         }
 
+        // --- NOWA KOMENDA NAWIGACJI (Obsługuje menu boczne) ---
+        [RelayCommand]
+        private void Navigate(string target)
+        {
+            
+            IsCarsVisible = false;
+            IsHistoryVisible = false;
+            IsModuleVisible = false;
+            CurrentView = null;
+
+            switch (target)
+            {
+                case "Samochody":
+                    IsCarsVisible = true;
+                    break;
+                case "Rezerwacje":
+                    ShowHistory(); 
+                    break;
+                case "DodajKlienta":
+                    CurrentView = new AddClientViewModel(); // Tworzy nowy moduł
+                    IsModuleVisible = true;
+                    break;
+                case "DodajAuto":
+                    // Tu w przyszłości: CurrentView = new AddCarViewModel();
+                    // IsModuleVisible = true;
+                    break;
+                case "Klienci":
+                    // Tu w przyszłości: CurrentView = new ClientsListViewModel();
+                    // IsModuleVisible = true;
+                    break;
+            }
+        }
+
+        
         private void LoadCarsFromDatabase()
         {
             using (var context = new AppDbContext())
@@ -86,11 +128,9 @@ namespace CarRentalApp.ViewModels
                 }
 
                 _allCars = data;
-
                 Cars.Clear();
                 foreach (var item in data) Cars.Add(item);
             }
-
             InitializeFilters();
         }
 
@@ -100,8 +140,6 @@ namespace CarRentalApp.ViewModels
             PopulateFilterList(AvailableModels, _allCars.Select(c => c.Car.Model));
             PopulateFilterList(AvailableSegments, _allCars.Select(c => c.Car.Segment));
             PopulateFilterList(AvailableFuelTypes, _allCars.Select(c => c.Car.FuelType));
-            PopulateFilterList(AvailableBodyTypes, _allCars.Select(c => c.Car.BodyType));
-            PopulateFilterList(AvailableGearboxTypes, _allCars.Select(c => c.Car.GearboxType));
 
             AvailableStatuses.Clear();
             var dostepnyItem = new FilterItem { Name = "Dostępny" };
@@ -113,6 +151,8 @@ namespace CarRentalApp.ViewModels
             AvailableStatuses.Add(dostepnyItem);
             AvailableStatuses.Add(wypozyczonyItem);
 
+            PopulateFilterList(AvailableGearboxTypes, _allCars.Select(c => c.Car.GearboxType));
+
             UpdateSummaries();
         }
 
@@ -122,12 +162,7 @@ namespace CarRentalApp.ViewModels
             foreach (var item in items.Distinct().Where(x => !string.IsNullOrEmpty(x)))
             {
                 var filterItem = new FilterItem { Name = item };
-
-                filterItem.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries();
-                };
-
+                filterItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
                 collection.Add(filterItem);
             }
         }
@@ -181,18 +216,18 @@ namespace CarRentalApp.ViewModels
             if (PriceFrom.HasValue) filtered = filtered.Where(c => c.Car.PricePerDay >= PriceFrom.Value);
             if (PriceTo.HasValue) filtered = filtered.Where(c => c.Car.PricePerDay <= PriceTo.Value);
 
-            if (SelectedSortOption == "Nazwa (A-Z)")
-                filtered = filtered.OrderBy(c => c.Car.Brand).ThenBy(c => c.Car.Model);
-            else if (SelectedSortOption == "Nazwa (Z-A)")
-                filtered = filtered.OrderByDescending(c => c.Car.Brand).ThenByDescending(c => c.Car.Model);
-            else if (SelectedSortOption == "Cena (rosnąco)")
-                filtered = filtered.OrderBy(c => c.Car.PricePerDay);
-            else if (SelectedSortOption == "Cena (malejąco)")
-                filtered = filtered.OrderByDescending(c => c.Car.PricePerDay);
+            if (SelectedSortOption == "Nazwa (A-Z)") filtered = filtered.OrderBy(c => c.Car.Brand).ThenBy(c => c.Car.Model);
+            else if (SelectedSortOption == "Nazwa (Z-A)") filtered = filtered.OrderByDescending(c => c.Car.Brand).ThenByDescending(c => c.Car.Model);
+            else if (SelectedSortOption == "Cena (rosnąco)") filtered = filtered.OrderBy(c => c.Car.PricePerDay);
+            else if (SelectedSortOption == "Cena (malejąco)") filtered = filtered.OrderByDescending(c => c.Car.PricePerDay);
 
             Cars.Clear();
-            foreach (var item in filtered) Cars.Add(item);
-        }
+            foreach (var item in filtered)
+            {
+                item.IsSelectedForCompare = CompareQueue.Any(q => q.Vin == item.Vin);
+                Cars.Add(item);
+                }
+            }
 
         [RelayCommand]
         private void ClearFilters()
@@ -201,33 +236,23 @@ namespace CarRentalApp.ViewModels
             foreach (var b in AvailableModels) b.IsSelected = false;
             foreach (var b in AvailableSegments) b.IsSelected = false;
             foreach (var b in AvailableFuelTypes) b.IsSelected = false;
-            foreach (var b in AvailableBodyTypes) b.IsSelected = false;
-            foreach (var b in AvailableGearboxTypes) b.IsSelected = false;
             foreach (var b in AvailableStatuses) b.IsSelected = false;
 
             PriceFrom = null;
             PriceTo = null;
 
+            PriceTo = null;
+
             if (SelectedSortOption != "Nazwa (A-Z)") SelectedSortOption = "Nazwa (A-Z)";
             else ApplyFilters();
-
             UpdateSummaries();
         }
         [RelayCommand]
-        private void ShowCars()
-        {
-            IsCarsVisible = true;
-            IsHistoryVisible = false;
-        }
-        [RelayCommand]
+        private void ShowCars() => Navigate("Samochody");
+
         private void ShowHistory()
         {
-            if (UserSession.CurrentClient == null)
-            {
-                MessageBox.Show("Sesja wygasła lub nie jesteś zalogowany jako klient.");
-                return;
-            }
-
+            if (UserSession.CurrentClient == null) return;
             try
             {
                 using (var context = new AppDbContext())
@@ -240,21 +265,16 @@ namespace CarRentalApp.ViewModels
                             Vin = r.CarVin,
                             Dates = r.StartDate.ToString("dd.MM.yyyy") + " - " + r.EndDate.ToString("dd.MM.yyyy"),
                             TotalPrice = r.TotalPrice
-                        })
-                        .ToList();
+                        }).ToList();
 
                     ReservationsHistory.Clear();
                     foreach (var item in history) ReservationsHistory.Add(item);
                 }
+                IsHistoryVisible = true;
             }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show($"Błąd podczas pobierania historii: {ex.Message}");
-            }
-
-            IsCarsVisible = false;
-            IsHistoryVisible = true;
+            catch (System.Exception ex) { MessageBox.Show($"Błąd pobierania historii: {ex.Message}"); }
         }
+
         [RelayCommand]
         private void OpenReservation(string vin)
         {
@@ -269,9 +289,17 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Logout()
         {
-            var loginView = new Views.LoginView();
-            loginView.Show();
-            Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView)?.Close();
+            UserSession.CurrentClient = null;
+            UserSession.CurrentWorker = null;
+            var oldWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView) ?? Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+            new Views.LoginView().Show();
+            oldWindow?.Close();
+        }
+
+        [RelayCommand]
+        private void ShowCarDetails(string carId)
+        {
+            if (!string.IsNullOrEmpty(carId)) new Views.CarDetailsView(carId).ShowDialog();
         }
 
         public class ReservationHistoryItem
@@ -283,13 +311,36 @@ namespace CarRentalApp.ViewModels
         }
 
         [RelayCommand]
-        private void ShowCarDetails(string carId)
+        private void ToggleCompare(CarFleet car)
         {
-            if (!string.IsNullOrEmpty(carId))
+            if (car == null) return;
+
+            if (car.IsSelectedForCompare)
             {
-                var detailsView = new Views.CarDetailsView(carId);
-                detailsView.ShowDialog();
+                var inQueue = CompareQueue.FirstOrDefault(q => q.Vin == car.Vin);
+                if (inQueue != null) CompareQueue.Remove(inQueue);
+                car.IsSelectedForCompare = false;
             }
+            else
+            {
+                if (CompareQueue.Count >= 3) { MessageBox.Show("Max 3 auta!"); return; }
+                CompareQueue.Add(car);
+                car.IsSelectedForCompare = true;
+            }
+            IsComparePanelVisible = CompareQueue.Count > 0;
+            if (CompareQueue.Count == 0) IsCompareListExpanded = false;
         }
+
+        [RelayCommand]
+        private void ToggleCompareList() => IsCompareListExpanded = !IsCompareListExpanded;
+
+        [RelayCommand]
+        private void OpenCompare()
+        {
+            if (CompareQueue.Count < 2) { MessageBox.Show("Wybierz min. 2 auta."); return; }
+            var ids = CompareQueue.Select(q => q.CarId).Distinct().ToList();
+            new Views.CompareView(ids).ShowDialog();
+        }
+
     }
 }

@@ -44,6 +44,8 @@ namespace CarRentalApp.Data
                 .HasForeignKey(r => r.CarVin)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<CarFleet>().Ignore(c => c.IsSelectedForCompare);
+            modelBuilder.Entity<Car>().Ignore(c => c.IsSelectedForCompare);
 
             modelBuilder.Entity<Car>().HasData(
                 new Car { IdCar = "C1", Brand = "Toyota", Model = "Corolla", PricePerDay = 150, ImagePath = "/Images/ToyotaCorolla.png", GearboxType = "Manual", FuelType = "Hybrid", BodyType = "Sedan", SeatsCount = 5, Segment = "C", DoorsCount = 5, TrunkCapacity = 470, EngineCapacity = 1.8 },
@@ -146,7 +148,9 @@ namespace CarRentalApp.Data
                 new Reservation { Id = 6, CarVin = "AUDRS300000000006", ClientId = 6, WorkerId = 6, StartDate = new DateTime(2026, 7, 1), EndDate = new DateTime(2026, 7, 3), TotalPrice = 1700 },
                 new Reservation { Id = 7, CarVin = "VOLXC900000000008", ClientId = 7, WorkerId = 7, StartDate = new DateTime(2026, 8, 10), EndDate = new DateTime(2026, 8, 20), TotalPrice = 6500 },
                 new Reservation { Id = 8, CarVin = "TESMOD30000000010", ClientId = 8, WorkerId = 8, StartDate = new DateTime(2026, 9, 5), EndDate = new DateTime(2026, 9, 7), TotalPrice = 900 }
+
             );
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
