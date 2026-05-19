@@ -27,8 +27,14 @@ namespace CarRentalApp.Models
         public virtual Car Car { get; set; } = null!;
         public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
+        [NotMapped]
+        public string CurrentStatus { get; set; } = string.Empty;
+
+        [NotMapped]
+        public string StatusColor { get; set; } = "Gray";
 
         private bool _isSelectedForCompare;
+
         [NotMapped]
         public bool IsSelectedForCompare
         {
