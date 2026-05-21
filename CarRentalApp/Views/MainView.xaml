@@ -239,7 +239,23 @@
                                 </Border>
                             </Grid>
                         </StackPanel>
-                        
+
+                        <StackPanel Margin="0,0,15,10">
+                            <TextBlock Text="Status" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
+                            <Grid Width="110">
+                                <ComboBox ItemsSource="{Binding AvailableStatuses}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Border Background="White" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
+                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+
                         <StackPanel Margin="0,0,15,10">
                             <TextBlock Text="Cena (zł / dzień)" Foreground="Gray" FontSize="12" Margin="0,0,0,2"/>
                             <StackPanel Orientation="Horizontal">
@@ -306,8 +322,8 @@
 
                                         <Grid Grid.Row="0" Margin="15,15,15,0">
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                                <Ellipse Width="15" Height="15" Fill="{Binding IsAvailable, Converter={StaticResource StatusColorConverter}}" Margin="0,0,8,0"/>
-                                                <TextBlock Text="{Binding IsAvailable, Converter={StaticResource StatusConverter}}" Foreground="#7F8C8D" FontSize="14" FontWeight="Bold"/>
+                                                <Ellipse Width="15" Height="15" Fill="{Binding StatusColor}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding CurrentStatus}" Foreground="#7F8C8D" FontSize="14" FontWeight="Bold"/>
                                             </StackPanel>
                                             <Button HorizontalAlignment="Right" 
                                                     Command="{Binding DataContext.ToggleCompareCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"

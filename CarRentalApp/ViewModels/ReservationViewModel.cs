@@ -99,12 +99,6 @@ namespace CarRentalApp.ViewModels
 
                 _context.Reservations.Add(reservation);
 
-                if (StartDate.Date == DateTime.Now.Date)
-                {
-                    var carFleet = _context.CarFleets.FirstOrDefault(c => c.Vin == CarVin);
-                    if (carFleet != null) carFleet.IsAvailable = false;
-                }
-
                 _context.SaveChanges();
 
                 MessageBox.Show("Rezerwacja zakończona sukcesem!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
