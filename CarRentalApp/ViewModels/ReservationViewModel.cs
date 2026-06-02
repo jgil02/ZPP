@@ -29,19 +29,39 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty]
         private decimal _totalPrice;
 
+        public List<DateTimeRange> OccupiedDates { get; private set; } = new();
+
+
         public ReservationViewModel(string vin)
         {
             CarVin = vin;
+            using var context = new AppDbContext();
 
-            var carFleet = _context.CarFleets.Include(c => c.Car).FirstOrDefault(c => c.Vin == vin);
-            if (carFleet != null)
+            var reservations = context.Reservations
+                .Where(r => r.CarVin.Trim() == vin.Trim() && r.EndDate >= DateTime.Now.Date)
+                .ToList();
+
+            foreach (var res in reservations)
             {
-                _pricePerDay = carFleet.Car.PricePerDay;
-                CarFullName = $"{carFleet.Car.Brand} {carFleet.Car.Model}";
+                OccupiedDates.Add(new DateTimeRange(res.StartDate.Date, res.EndDate.Date));
             }
+
+
+            while (OccupiedDates.Any(d => StartDate.Date >= d.Start.Date && StartDate.Date <= d.End.Date))
+            {
+                StartDate = StartDate.AddDays(1);
+            }
+
+            EndDate = StartDate.AddDays(1);
+
+            var carFleet = context.CarFleets.Include(c => c.Car).FirstOrDefault(c => c.Vin == vin);
+            if (carFleet != null) _pricePerDay = carFleet.Car.PricePerDay;
 
             CalculatePrice();
         }
+
+        public record DateTimeRange(DateTime Start, DateTime End);
+
 
         partial void OnStartDateChanged(DateTime value) => CalculatePrice();
         partial void OnEndDateChanged(DateTime value) => CalculatePrice();

@@ -83,33 +83,28 @@ namespace CarRentalApp.ViewModels
         {
             using (var context = new AppDbContext())
             {
-                var data = context.CarFleets
-                    .Include(c => c.Car)
-                    .Include(c => c.Reservations)
-                    .ToList();
+                var data = context.CarFleets.Include(c => c.Car).ToList();
+                var today = DateTime.Now.Date;
 
-                DateTime today = DateTime.Now.Date;
+                var activeReservations = context.Reservations
+                    .Where(r => today >= r.StartDate.Date && today <= r.EndDate.Date)
+                    .ToList();
 
                 foreach (var fleet in data)
                 {
-                    if (!fleet.IsAvailable)
+                    bool isBusyToday = activeReservations.Any(r => r.CarVin.Trim() == fleet.Vin.Trim());
+
+                    if (isBusyToday)
                     {
-                        fleet.CurrentStatus = "Niedostępny";
-                        fleet.StatusColor = "#922B21";
+                        fleet.CurrentStatus = "Wypożyczony";
+                        fleet.StatusColor = "#E74C3C"; 
+                        fleet.IsAvailable = false;
                     }
                     else
                     {
-                        bool isRented = fleet.Reservations.Any(r => today >= r.StartDate.Date && today <= r.EndDate.Date);
-                        if (isRented)
-                        {
-                            fleet.CurrentStatus = "Wypożyczony";
-                            fleet.StatusColor = "#E67E22";
-                        }
-                        else
-                        {
-                            fleet.CurrentStatus = "Dostępny";
-                            fleet.StatusColor = "#27AE60";
-                        }
+                        fleet.CurrentStatus = "Dostępny";
+                        fleet.StatusColor = "#27AE60";
+                        fleet.IsAvailable = true;
                     }
                 }
 
@@ -273,7 +268,14 @@ namespace CarRentalApp.ViewModels
         private void OpenReservation(string vin)
         {
             var selectedCar = Cars.FirstOrDefault(c => c.Vin == vin);
-            if (selectedCar != null) new Views.ReservationView(selectedCar.Vin).ShowDialog();
+
+            if (selectedCar != null)
+            {
+                var reservationView = new Views.ReservationView(selectedCar.Vin);
+                reservationView.ShowDialog();
+                LoadCarsFromDatabase();
+            }
+
         }
 
         [RelayCommand]

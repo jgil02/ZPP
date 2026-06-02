@@ -6,6 +6,17 @@
         x:Name="ResWindow"
         Background="#F1F2F6">
 
+    <Window.Resources>
+        <Style TargetType="CalendarDayButton">
+            <Style.Triggers>
+                <Trigger Property="IsBlackedOut" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="FontWeight" Value="ExtraBold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Border Background="White" Margin="20" CornerRadius="10" Padding="20">
         <Border.Effect>
             <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2"/>
@@ -15,11 +26,10 @@
             <TextBlock Text="Zarezerwuj pojazd" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,20" HorizontalAlignment="Center"/>
 
             <TextBlock Text="Data odbioru:" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,5"/>
-
-            <DatePicker SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,15" FontSize="14"/>
+            <DatePicker x:Name="StartDatePicker" SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,15" FontSize="14"/>
 
             <TextBlock Text="Data zwrotu:" FontWeight="SemiBold" Foreground="#7F8C8D" Margin="0,0,0,5"/>
-            <DatePicker SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,25" FontSize="14"/>
+            <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,25" FontSize="14"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
                 <TextBlock Text="Całkowity koszt: " FontSize="16" Foreground="#2C3E50" VerticalAlignment="Center"/>
@@ -27,11 +37,10 @@
                 <TextBlock Text=" zł" FontSize="22" FontWeight="Bold" Foreground="#27AE60"/>
             </StackPanel>
 
-
             <Button Content="POTWIERDŹ REZERWACJĘ" 
                     Command="{Binding ConfirmReservationCommand}"
                     CommandParameter="{Binding ElementName=ResWindow}"
-                    Height="45" Background="#34495E" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0">
+                    Height="45" Background="#34495E" Foreground="White" FontSize="14" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" CornerRadius="8">
