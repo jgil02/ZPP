@@ -3,9 +3,12 @@ using CommunityToolkit.Mvvm.Input;
 using CarRentalApp.Data;
 using CarRentalApp.Models;
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
 
 namespace CarRentalApp.ViewModels
 {
@@ -101,12 +104,67 @@ namespace CarRentalApp.ViewModels
 
                 _context.SaveChanges();
 
+                // Generowanie PDF po zapisaniu rezerwacji
+                GenerateReservationPdf(reservation);
+
                 MessageBox.Show("Rezerwacja zakończona sukcesem!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                 window?.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Błąd podczas zapisu do bazy: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void GenerateReservationPdf(Reservation reservation)
+        {
+            try
+            {
+                var docs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                var folder = Path.Combine(docs, "CarRental", "Reservations");
+                Directory.CreateDirectory(folder);
+
+                var fileName = $"Reservation_{reservation.Id}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+                var path = Path.Combine(folder, fileName);
+
+                var client = _context.Clients.Find(reservation.ClientId);
+                var worker = _context.Workers.Find(reservation.WorkerId);
+
+                var clientInfo = client != null
+                    ? $"{client.FirstName} {client.LastName}\nEmail: {client.Email}\nTelefon: {client.Phone}"
+                    : "Klient: —";
+
+                var workerInfo = worker != null
+                    ? $"{worker.FirstName} {worker.LastName}"
+                    : "Pracownik: —";
+
+                var document = Document.Create(container =>
+                {
+                    container.Page(page =>
+                    {
+                        page.Margin(30);
+                        page.DefaultTextStyle(x => x.FontSize(12));
+                        page.Header().Text("Potwierdzenie rezerwacji").FontSize(18).SemiBold().AlignCenter();
+                        page.Content().PaddingTop(10).Column(column =>
+                        {
+                            column.Item().Text($"Rezerwacja ID: {reservation.Id}");
+                            column.Item().Text($"Samochód: {CarFullName} ({reservation.CarVin})");
+                            column.Item().Text($"Data odbioru: {reservation.StartDate:yyyy-MM-dd}");
+                            column.Item().Text($"Data zwrotu: {reservation.EndDate:yyyy-MM-dd}");
+                            column.Item().Text($"Cena całkowita: {reservation.TotalPrice:C}");
+                            column.Item().Text(clientInfo);
+                            column.Item().Text(workerInfo);
+                            column.Item().Text($"Wygenerowano: {DateTime.Now:yyyy-MM-dd HH:mm}");
+                        });
+                        page.Footer().AlignCenter().Text("Potwierdzenie wygenerowane przez CarRentalApp");
+                    });
+                });
+
+                document.GeneratePdf(path);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd podczas generowania PDF: {ex.Message}", "Błąd PDF", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

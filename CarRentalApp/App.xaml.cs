@@ -1,13 +1,15 @@
-ï»¿using System.Configuration;
-using System.Data;
 using System.Windows;
 
-namespace CarRentalApp;
-
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
-public partial class App : Application
+namespace CarRentalApp
 {
-}
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            // Pe³na kwalifikacja eliminuje problem z brakiem using/typu
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
+            base.OnStartup(e);
+        }
+    }
+}
