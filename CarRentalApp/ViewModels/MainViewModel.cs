@@ -317,5 +317,27 @@ namespace CarRentalApp.ViewModels
             public string Dates { get; set; } = string.Empty;
             public decimal TotalPrice { get; set; }
         }
+        [ObservableProperty]
+        private bool _isDarkMode = false;
+
+        [RelayCommand]
+        private void ToggleTheme()
+        {
+            IsDarkMode = !IsDarkMode;
+            string themeName = IsDarkMode ? "DarkTheme" : "LightTheme";
+            var uri = new Uri($"Themes/{themeName}.xaml", UriKind.Relative);
+
+            var resources = Application.Current.Resources;
+            
+            // Szuka aktualnego motywu i go usuwa
+            var oldTheme = resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme.xaml"));
+            if (oldTheme != null)
+            {
+                resources.MergedDictionaries.Remove(oldTheme);
+            }
+
+            // Wrzuca nowy motyw
+            resources.MergedDictionaries.Add(new ResourceDictionary { Source = uri });
+        }
     }
 }
