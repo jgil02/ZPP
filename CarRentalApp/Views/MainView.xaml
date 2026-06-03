@@ -21,6 +21,114 @@
             <views:AddClientView />
         </DataTemplate>
 
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="{DynamicResource FilterSummaryBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource FilterSummaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource FilterSummaryBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource FilterSummaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{DynamicResource FilterSummaryBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource FilterSummaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="30"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False" TextElement.Foreground="{TemplateBinding Foreground}"/>
+
+                                    <ToggleButton Grid.Column="1" Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <ToggleButton.Template>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border Background="Transparent">
+                                                    <Path Data="M0,0 L4,4 L8,0 Z" Fill="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </ToggleButton.Template>
+                                    </ToggleButton>
+                                </Grid>
+                            </Border>
+
+                            <Popup Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False">
+                                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="250" CornerRadius="4" Margin="0,2,0,0">
+                                    <ScrollViewer>
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Width="8">
+                            <Border Background="Transparent" />
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border Background="{DynamicResource TextSecondaryBrush}" CornerRadius="4" Margin="0,2" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#BDC3C7"/>
@@ -173,7 +281,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding BrandSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding BrandSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -189,7 +297,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding ModelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ModelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -205,7 +313,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding FuelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding FuelSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -221,7 +329,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding BodySummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding BodySummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -237,7 +345,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding GearboxSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding GearboxSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -253,7 +361,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -261,9 +369,9 @@
                         <StackPanel Margin="0,0,15,10">
                             <TextBlock Text="Cena (zł / dzień)" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,2"/>
                             <StackPanel Orientation="Horizontal">
-                                <TextBox Text="{Binding PriceFrom, UpdateSourceTrigger=PropertyChanged}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
-                                <TextBlock Text=" - " VerticalAlignment="Center" Margin="2,0,2,0"/>
-                                <TextBox Text="{Binding PriceTo, UpdateSourceTrigger=PropertyChanged}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
+                                <TextBox Text="{Binding PriceFrom, UpdateSourceTrigger=PropertyChanged}" Background="{DynamicResource FilterSummaryBgBrush}" Foreground="{DynamicResource FilterSummaryTextBrush}" BorderBrush="{DynamicResource BorderBrush}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
+                                <TextBlock Text=" - " Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="2,0,2,0"/>
+                                <TextBox Text="{Binding PriceTo, UpdateSourceTrigger=PropertyChanged}" Background="{DynamicResource FilterSummaryBgBrush}" Foreground="{DynamicResource FilterSummaryTextBrush}" BorderBrush="{DynamicResource BorderBrush}" Width="50" Height="22" VerticalContentAlignment="Center" Padding="2,0"/>
                             </StackPanel>
                         </StackPanel>
 
@@ -278,7 +386,7 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="Black" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
@@ -362,7 +470,7 @@
                                         </Grid>
                                         <TextBlock Grid.Row="3" Margin="20,0,20,20" Foreground="#95A5A6" FontSize="13"><Run Text="{Binding Car.FuelType}"/><Run Text=" • "/><Run Text="{Binding Car.GearboxType}"/><Run Text=" • "/><Run Text="{Binding Car.BodyType}"/></TextBlock>
                                         <Button Grid.Row="4" Content="REZERWUJ" Command="{Binding DataContext.OpenReservationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Vin}" Margin="20,0,20,20" Height="40" Background="{DynamicResource PrimaryButtonBrush}" Foreground="{DynamicResource PrimaryButtonTextBrush}" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
-                                        <Button Grid.Row="5" Content="SZCZEGÓŁY POJAZDU" Command="{Binding DataContext.ShowCarDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding CarId}" Margin="20,0,20,20" Height="35" Background="Transparent" Foreground="#34495E" BorderBrush="#BDC3C7" BorderThickness="1" Cursor="Hand"/>
+                                        <Button Grid.Row="5" Content="SZCZEGÓŁY POJAZDU" Command="{Binding DataContext.ShowCarDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding CarId}" Margin="20,0,20,20" Height="35" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

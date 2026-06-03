@@ -10,4 +10,29 @@
     <SolidColorBrush x:Key="SecondaryButtonBrush" Color="#BDC3C7"/>
     <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="Black"/>
     <SolidColorBrush x:Key="BorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="FilterSummaryBgBrush" Color="White"/>
+    <SolidColorBrush x:Key="FilterSummaryTextBrush" Color="Black"/>
+
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#F1F2F6"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlLightBrushKey}" Color="#EAEAEA"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlLightLightBrushKey}" Color="White"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlDarkBrushKey}" Color="#CCCCCC"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#34495E"/>
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+
+    <SolidColorBrush x:Key="WorkerAccentBrush" Color="#922B21"/>
+    <SolidColorBrush x:Key="WorkerAccentHoverBrush" Color="#A93226"/>
+
+    <Style TargetType="DatePicker">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="BorderBrush" Value="#BDC3C7"/>
+    </Style>
+    <Style TargetType="DatePickerTextBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
 </ResourceDictionary>
