@@ -21,6 +21,10 @@
             <views:AddClientView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type vm:AddCarViewModel}">
+            <views:AddCarView />
+        </DataTemplate>
+
         <Style TargetType="PasswordBox">
             <Setter Property="Background" Value="{DynamicResource FilterSummaryBgBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource FilterSummaryTextBrush}"/>

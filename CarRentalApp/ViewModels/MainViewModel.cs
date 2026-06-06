@@ -73,9 +73,10 @@ namespace CarRentalApp.ViewModels
             IsCarsVisible = false; IsHistoryVisible = false; IsModuleVisible = false; CurrentView = null;
             switch (target)
             {
-                case "Samochody": IsCarsVisible = true; break;
+                case "Samochody": LoadCarsFromDatabase(); IsCarsVisible = true; break;
                 case "Rezerwacje": ShowHistory(); break;
                 case "DodajKlienta": CurrentView = new AddClientViewModel(); IsModuleVisible = true; break;
+                case "DodajAuto":CurrentView = new AddCarViewModel(); IsModuleVisible = true; break;
             }
         }
 
@@ -83,7 +84,7 @@ namespace CarRentalApp.ViewModels
         {
             using (var context = new AppDbContext())
             {
-                var data = context.CarFleets.Include(c => c.Car).ToList();
+                var data = context.CarFleets.AsNoTracking().Include(c => c.Car).ToList();
                 var today = DateTime.Now.Date;
 
                 var activeReservations = context.Reservations

@@ -1,0 +1,160 @@
+﻿<UserControl x:Class="CarRentalApp.Views.AddCarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+
+    <Grid>
+        <Border Background="White" CornerRadius="15" Margin="10" Padding="40">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15" Opacity="0.1" ShadowDepth="2"/>
+            </Border.Effect>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Dodawanie nowego pojazdu" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+                    <TextBlock Text="Wypełnij specyfikację modelu oraz dane konkretnego egzemplarza do floty." Foreground="Gray" Margin="0,0,0,40"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        
+                        <StackPanel Grid.Column="0" Margin="0,0,20,0">
+                            <TextBlock Text="INFORMACJE O MODELU" FontSize="12" FontWeight="Bold" Foreground="#922B21" Margin="0,0,0,20"/>
+
+                            <TextBlock Text="Unikalne ID (IdCar)" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                <TextBox Text="{Binding IdCar}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </Border>
+
+                            <UniformGrid Columns="2" Margin="0,0,0,15">
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Marka" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding Brand}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Model" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding Model}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                            </UniformGrid>
+
+                            <TextBlock Text="Cena za dobę (zł)" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                <TextBox Text="{Binding PricePerDay}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </Border>
+
+                            <TextBlock Text="Link do zdjęcia (URL lub /Images/...)" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                <TextBox Text="{Binding ImagePath}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </Border>
+
+                            <TextBlock Text="Segment" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                <TextBox Text="{Binding Segment}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </Border>
+                           
+                                <TextBlock Text="Typ nadwozia (np. Sedan, Kombi, SUV)" Foreground="#7F8C8D" Margin="0,10,0,5"/>
+                                <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                    <TextBox Text="{Binding BodyType, UpdateSourceTrigger=PropertyChanged}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                </Border>
+                            </StackPanel>
+
+                        
+                        <StackPanel Grid.Column="1" Margin="20,0,0,0">
+                            <TextBlock Text="SPECYFIKACJA TECHNICZNA" FontSize="12" FontWeight="Bold" Foreground="#922B21" Margin="0,0,0,20"/>
+
+                            <UniformGrid Columns="2" Margin="0,0,0,15">
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Paliwo" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding FuelType}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Skrzynia" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding GearboxType}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                               
+                            </UniformGrid>
+
+                            <UniformGrid Columns="3" Margin="0,0,0,15">
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Silnik (L)" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding EngineCapacity}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Miejsca" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding SeatsCount}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Drzwi" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding DoorsCount}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Pojemność bagażnika (l)" Foreground="#7F8C8D" Margin="0,10,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                        <TextBox Text="{Binding TrunkCapacity, UpdateSourceTrigger=PropertyChanged}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                            </UniformGrid>
+
+                            
+                            <TextBlock Text="DANE EGZEMPLARZA (FLOTA)" FontSize="12" FontWeight="Bold" Foreground="#922B21" Margin="0,15,0,15"/>
+
+                            <TextBlock Text="Numer VIN" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                            <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5" Margin="0,0,0,15">
+                                <TextBox Text="{Binding Vin}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                            </Border>
+
+                            <UniformGrid Columns="2" Margin="0,0,0,25">
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Nr Rejestracyjny" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding RegistrationNumber}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Przebieg (km)" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+                                    <Border BorderBrush="#D1D8E0" BorderThickness="1" CornerRadius="5">
+                                        <TextBox Text="{Binding Mileage}" Height="35" BorderThickness="0" VerticalContentAlignment="Center" Padding="10,0"/>
+                                    </Border>
+                                </StackPanel>
+                            </UniformGrid>
+
+                            <Button Content="ZAPISZ SAMOCHÓD WE FLOCIE" 
+                                    Command="{Binding SaveCarCommand}"
+                                    Height="50" Background="#922B21" Foreground="White" FontSize="15" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#A93226"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>
