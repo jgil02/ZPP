@@ -233,8 +233,8 @@
 
                 <StackPanel Visibility="{Binding IsWorker, Converter={StaticResource BoolToVis}}">
                     <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyleWorker}"/>
-                    <Button Content="Lista rezerwacji" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyleWorker}"/>
-                    <Button Content="Lista klientów" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Lista Rezerwacji" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Lista Klientów" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Dodaj Auto" Command="{Binding NavigateCommand}" CommandParameter="DodajAuto" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Dodaj Klienta" Command="{Binding NavigateCommand}" CommandParameter="DodajKlienta" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Separator Background="{DynamicResource PrimaryButtonBrush}" Margin="0,20"/>
@@ -259,7 +259,10 @@
                            Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}"/>
                 <TextBlock Text="Panel Operacyjny" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" 
                            Visibility="{Binding IsModuleVisible, Converter={StaticResource BoolToVis}}"/>
-                <TextBlock Text="Lista Klientów" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Visibility="{Binding IsClientsVisible, Converter={StaticResource BoolToVis}}"/>
+                <TextBlock Text="Lista Klientów" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" 
+                           Visibility="{Binding IsClientsVisible, Converter={StaticResource BoolToVis}}"/>
+                <TextBlock Text="Lista Rezerwacji" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" 
+                           Visibility="{Binding IsAllReservationsVisible, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
 
             
@@ -338,7 +341,7 @@
                                 </Border>
                             </Grid>
                         </StackPanel>
-                        
+
                         <StackPanel Margin="0,0,15,10">
                             <TextBlock Text="Skrzynia" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,2"/>
                             <Grid Width="110">
@@ -351,22 +354,6 @@
                                 </ComboBox>
                                 <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
                                     <TextBlock Text="{Binding GearboxSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                </Border>
-                            </Grid>
-                        </StackPanel>
-
-                        <StackPanel Margin="0,0,15,10">
-                            <TextBlock Text="Status" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,2"/>
-                            <Grid Width="110">
-                                <ComboBox ItemsSource="{Binding AvailableStatuses}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="2" Cursor="Hand"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                                <Border Background="{DynamicResource CardBackgroundBrush}" Margin="2,2,22,2" IsHitTestVisible="False" CornerRadius="2">
-                                    <TextBlock Text="{Binding StatusSummary}" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource FilterSummaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                 </Border>
                             </Grid>
                         </StackPanel>
