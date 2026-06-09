@@ -248,21 +248,69 @@ namespace CarRentalApp.ViewModels
         private void ShowHistory()
         {
             if (UserSession.CurrentClient == null) return;
-            try {
-                using (var context = new AppDbContext()) {
-                    var history = context.Reservations
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    var today = DateTime.Now.Date;
+
+                    var reservations = context.Reservations
+                        .Include(r => r.CarFleet)
+                            .ThenInclude(cf => cf.Car)
                         .Where(r => r.ClientId == UserSession.CurrentClient.ClientID)
-                        .Select(r => new ReservationHistoryItem {
-                            CarName = r.CarFleet.Car.Brand + " " + r.CarFleet.Car.Model,
+                        .OrderByDescending(r => r.StartDate)
+                        .ToList(); 
+
+                    var history = reservations.Select(r =>
+                    {
+                        var next = reservations
+                            .Where(nr => nr.CarVin.Trim() == r.CarVin.Trim() && nr.Id != r.Id && nr.StartDate.Date > r.EndDate.Date)
+                            .OrderBy(nr => nr.StartDate)
+                            .FirstOrDefault();
+
+                        DateTime? maxAllowed = next != null ? next.StartDate.Date.AddDays(-1) : (DateTime?)null;
+
+                        bool isFinished = r.EndDate.Date < today;
+                        bool cannotExtendBecauseMaxIsBeforeToday = maxAllowed.HasValue && today > maxAllowed.Value;
+
+                        bool showChange = !isFinished && (!maxAllowed.HasValue || today <= maxAllowed.Value);
+
+                        return new ReservationHistoryItem
+                        {
+                            Id = r.Id,
+                            CarName = r.CarFleet?.Car != null ? r.CarFleet.Car.Brand + " " + r.CarFleet.Car.Model : r.CarVin,
                             Vin = r.CarVin,
                             Dates = r.StartDate.ToString("dd.MM.yyyy") + " - " + r.EndDate.ToString("dd.MM.yyyy"),
-                            TotalPrice = r.TotalPrice
-                        }).ToList();
+                            TotalPrice = r.TotalPrice,
+                            StartDate = r.StartDate,
+                            EndDate = r.EndDate,
+                            MaxAllowedEndDate = maxAllowed,
+                            ShowChangeButton = showChange
+                        };
+                    }).ToList();
+
                     ReservationsHistory.Clear();
                     foreach (var item in history) ReservationsHistory.Add(item);
                 }
                 IsHistoryVisible = true;
-            } catch (Exception ex) { MessageBox.Show($"Błąd: {ex.Message}"); }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private void OpenChangeEndDate(ReservationHistoryItem item)
+        {
+            if (item == null) return;
+
+            var owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView);
+            var wnd = new Views.ChangeEndDateView(item.Id, item.Vin, item.EndDate);
+            if (owner != null) wnd.Owner = owner;
+            wnd.ShowDialog();
+
+            ShowHistory();
         }
 
         [RelayCommand]
@@ -313,10 +361,15 @@ namespace CarRentalApp.ViewModels
         [RelayCommand] private void OpenCompare() => new Views.CompareView(CompareQueue.Select(q => q.CarId).ToList()).ShowDialog();
 
         public class ReservationHistoryItem {
+            public int Id { get; set; }
             public string CarName { get; set; } = string.Empty;
             public string Vin { get; set; } = string.Empty;
             public string Dates { get; set; } = string.Empty;
             public decimal TotalPrice { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+            public DateTime? MaxAllowedEndDate { get; set; }
+            public bool ShowChangeButton { get; set; } = false;
         }
         [ObservableProperty]
         private bool _isDarkMode = false;
@@ -330,14 +383,11 @@ namespace CarRentalApp.ViewModels
 
             var resources = Application.Current.Resources;
             
-            // Szuka aktualnego motywu i go usuwa
             var oldTheme = resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme.xaml"));
             if (oldTheme != null)
             {
                 resources.MergedDictionaries.Remove(oldTheme);
             }
-
-            // Wrzuca nowy motyw
             resources.MergedDictionaries.Add(new ResourceDictionary { Source = uri });
         }
     }

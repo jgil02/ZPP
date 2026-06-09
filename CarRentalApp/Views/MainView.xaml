@@ -16,7 +16,7 @@
         <conv:StatusColorConverter x:Key="StatusColorConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- REJESTRACJA NOWYCH MODUŁÓW -->
+       
         <DataTemplate DataType="{x:Type vm:AddClientViewModel}">
             <views:AddClientView />
         </DataTemplate>
@@ -194,7 +194,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- SIDEBAR -->
+        
         <Border Grid.Column="0">
             <Border.Style>
                 <Style TargetType="Border">
@@ -251,7 +251,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- NAGŁÓWKI -->
+            
             <StackPanel Grid.Row="0" Margin="0,0,0,15">
                 <TextBlock Text="Lista Samochodów" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" 
                            Visibility="{Binding IsCarsVisible, Converter={StaticResource BoolToVis}}"/>
@@ -400,7 +400,7 @@
                             <Button Content="Wyczyść" Command="{Binding ClearFiltersCommand}" Background="{DynamicResource SecondaryButtonBrush}" Foreground="{DynamicResource SecondaryButtonTextBrush}" Width="60" Height="25" Cursor="Hand"/>
                         </StackPanel>
                     </WrapPanel>
-                    <!-- Sortowanie -->
+                    
                     <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Right">
                         <TextBlock Text="Sortuj po" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,2"/>
                         <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption}" Width="130" Height="24" Cursor="Hand"/>
@@ -482,7 +482,6 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <!-- PANEL PORÓWNYWARKI -->
                 <Border Grid.Row="0" Grid.RowSpan="3" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,-180,180,0" Background="#2C3E50" CornerRadius="15" Padding="15" Width="280" Visibility="{Binding IsComparePanelVisible, Converter={StaticResource BoolToVis}}" Panel.ZIndex="100">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="20" Opacity="0.5" ShadowDepth="5" Direction="270"/>
@@ -578,6 +577,18 @@
                                                     <Border Background="#EBF5FB" CornerRadius="4" Padding="10,4" Margin="0,12,0,0" HorizontalAlignment="Right">
                                                         <TextBlock Text="POTWIERDZONA" FontSize="10" FontWeight="Bold" Foreground="#2980B9"/>
                                                     </Border>
+
+                                                    <Button Content="Zmień termin oddania"
+                                                            Width="150"
+                                                            Height="30"
+                                                            Margin="0,12,0,0"
+                                                            HorizontalAlignment="Right"
+                                                            Command="{Binding DataContext.OpenChangeEndDateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Visibility="{Binding ShowChangeButton, Converter={StaticResource BoolToVis}}"
+                                                            Background="{DynamicResource PrimaryButtonBrush}"
+                                                            Foreground="{DynamicResource PrimaryButtonTextBrush}"
+                                                            Cursor="Hand"/>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -604,7 +615,6 @@
                     </Grid>
                 </Border>
 
-                <!-- 3. MODUŁY (np. Dodaj Klienta) -->
                 <ContentControl Content="{Binding CurrentView}" Visibility="{Binding IsModuleVisible, Converter={StaticResource BoolToVis}}"/>
             </Grid>
         </Grid>
