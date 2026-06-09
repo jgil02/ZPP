@@ -234,7 +234,7 @@
                 <StackPanel Visibility="{Binding IsWorker, Converter={StaticResource BoolToVis}}">
                     <Button Content="Katalog Floty" Command="{Binding NavigateCommand}" CommandParameter="Samochody" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Zarządzaj Rezerwacjami" Command="{Binding NavigateCommand}" CommandParameter="ZarzadzajRezerwacjami" Style="{StaticResource MenuButtonStyleWorker}"/>
-                    <Button Content="Klienci" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyleWorker}"/>
+                    <Button Content="Lista klientów" Command="{Binding NavigateCommand}" CommandParameter="Klienci" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Dodaj Auto" Command="{Binding NavigateCommand}" CommandParameter="DodajAuto" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Button Content="Dodaj Klienta" Command="{Binding NavigateCommand}" CommandParameter="DodajKlienta" Style="{StaticResource MenuButtonStyleWorker}"/>
                     <Separator Background="{DynamicResource PrimaryButtonBrush}" Margin="0,20"/>
@@ -259,6 +259,7 @@
                            Visibility="{Binding IsHistoryVisible, Converter={StaticResource BoolToVis}}"/>
                 <TextBlock Text="Panel Operacyjny" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" 
                            Visibility="{Binding IsModuleVisible, Converter={StaticResource BoolToVis}}"/>
+                <TextBlock Text="Lista Klientów" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Visibility="{Binding IsClientsVisible, Converter={StaticResource BoolToVis}}"/>
             </StackPanel>
 
             
@@ -475,6 +476,7 @@
                                         <TextBlock Grid.Row="3" Margin="20,0,20,20" Foreground="#95A5A6" FontSize="13"><Run Text="{Binding Car.FuelType}"/><Run Text=" • "/><Run Text="{Binding Car.GearboxType}"/><Run Text=" • "/><Run Text="{Binding Car.BodyType}"/></TextBlock>
                                         <Button Grid.Row="4" Content="REZERWUJ" Command="{Binding DataContext.OpenReservationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Vin}" Margin="20,0,20,20" Height="40" Background="{DynamicResource PrimaryButtonBrush}" Foreground="{DynamicResource PrimaryButtonTextBrush}" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
                                         <Button Grid.Row="5" Content="SZCZEGÓŁY POJAZDU" Command="{Binding DataContext.ShowCarDetailsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding CarId}" Margin="20,0,20,20" Height="35" Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Cursor="Hand"/>
+                                       
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -606,6 +608,134 @@
 
                 <!-- 3. MODUŁY (np. Dodaj Klienta) -->
                 <ContentControl Content="{Binding CurrentView}" Visibility="{Binding IsModuleVisible, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- 4. LISTA KLIENTÓW -->
+                <Grid Visibility="{Binding IsClientsVisible, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- WYSZUKIWARKA -->
+                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="12" Padding="15,8" Margin="0,0,0,20">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Opacity="0.1" ShadowDepth="2" Direction="270"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Path Grid.Column="0" Data="M15.5 15.5L20 20M11 15C13.2091 15 15 13.2091 15 11C15 8.79086 13.2091 7 11 7C8.79086 7 7 8.79086 7 11C7 13.2091 8.79086 15 11 15Z" Stroke="{DynamicResource TextSecondaryBrush}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center"/>
+
+                            <Grid Grid.Column="1">
+                                <TextBlock Text="Wyszukaj klienta po danych..." IsHitTestVisible="False" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" FontStyle="Italic" FontSize="14">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBox x:Name="SearchBox" Text="{Binding SearchClientText, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" FontSize="14" Foreground="{DynamicResource TextPrimaryBrush}" CaretBrush="{DynamicResource TextPrimaryBrush}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- TABELA -->
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackgroundBrush}" CornerRadius="15" Padding="5" ClipToBounds="True">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="15" Opacity="0.1" ShadowDepth="4" Direction="270"/>
+                        </Border.Effect>
+                        <DataGrid ItemsSource="{Binding FilteredClients}" AutoGenerateColumns="False" Background="Transparent" BorderThickness="0" IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="None" RowHeight="50" SelectionMode="Single">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="Padding" Value="15,10"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource PrimaryButtonBrush}"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding ClientID}" Width="60">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="UŻYTKOWNIK" Width="1.5*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center" Margin="10,0">
+                                                <TextBlock Text="{Binding Username}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                <TextBlock Text="{Binding Email}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="IMIĘ I NAZWISKO" Width="2*">
+                                    <DataGridTextColumn.Binding>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding>
+                                    </DataGridTextColumn.Binding>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10,0"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="TELEFON" Binding="{Binding Phone}" Width="*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10,0"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="MIASTO" Binding="{Binding City}" Width="*">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10,0"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+
             </Grid>
         </Grid>
     </Grid>

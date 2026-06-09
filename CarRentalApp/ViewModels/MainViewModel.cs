@@ -18,6 +18,8 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private bool _isCarsVisible = true;
         [ObservableProperty] private bool _isHistoryVisible = false;
         [ObservableProperty] private bool _isModuleVisible = false;
+        [ObservableProperty] private bool _isClientsVisible = false;
+        [ObservableProperty] private string _currentPage = "Samochody";
 
         private List<CarFleet> _allCars = new();
 
@@ -28,7 +30,6 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private bool _isCompareListExpanded;
 
         public ObservableCollection<CarFleet> CompareQueue { get; } = new();
-
         public ObservableCollection<CarFleet> Cars { get; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
 
@@ -40,16 +41,20 @@ namespace CarRentalApp.ViewModels
         public ObservableCollection<FilterItem> AvailableBodyTypes { get; } = new();
         public ObservableCollection<FilterItem> AvailableGearboxTypes { get; } = new();
         public ObservableCollection<FilterItem> AvailableStatuses { get; } = new();
+        public ObservableCollection<Client> AllClients { get; } = new();
+        public ObservableCollection<Client> FilteredClients { get; } = new();
 
         [ObservableProperty] private string _brandSummary = "Wszystkie";
         [ObservableProperty] private string _modelSummary = "Wszystkie";
         [ObservableProperty] private string _segmentSummary = "Wszystkie";
-        [ObservableProperty] private string _fuelSummary = "Wszystkie"; [ObservableProperty] private string _bodySummary = "Wszystkie";
+        [ObservableProperty] private string _fuelSummary = "Wszystkie";
+        [ObservableProperty] private string _bodySummary = "Wszystkie";
         [ObservableProperty] private string _gearboxSummary = "Wszystkie";
         [ObservableProperty] private string _statusSummary = "Wszystkie";
 
         [ObservableProperty] private decimal? _priceFrom;
         [ObservableProperty] private decimal? _priceTo;
+        [ObservableProperty] private string _searchClientText = "";
 
         public ObservableCollection<string> SortOptions { get; } = new()
         {
@@ -59,6 +64,7 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private string _selectedSortOption = "Nazwa (A-Z)";
 
         partial void OnSelectedSortOptionChanged(string value) => ApplyFilters();
+        partial void OnSearchClientTextChanged(string value) => ApplyClientFilter();
 
         public MainViewModel()
         {
@@ -70,13 +76,35 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Navigate(string target)
         {
-            IsCarsVisible = false; IsHistoryVisible = false; IsModuleVisible = false; CurrentView = null;
+            // Resetowanie wszystkich widoków
+            IsCarsVisible = false;
+            IsHistoryVisible = false;
+            IsModuleVisible = false;
+            IsClientsVisible = false;
+            CurrentView = null;
+            CurrentPage = target; // Ustawienie dla podświetlenia menu
+
             switch (target)
             {
-                case "Samochody": LoadCarsFromDatabase(); IsCarsVisible = true; break;
-                case "Rezerwacje": ShowHistory(); break;
-                case "DodajKlienta": CurrentView = new AddClientViewModel(); IsModuleVisible = true; break;
-                case "DodajAuto":CurrentView = new AddCarViewModel(); IsModuleVisible = true; break;
+                case "Samochody":
+                    LoadCarsFromDatabase();
+                    IsCarsVisible = true;
+                    break;
+                case "Rezerwacje":
+                    ShowHistory();
+                    break;
+                case "Klienci":
+                    FetchClientsFromDb();
+                    IsClientsVisible = true;
+                    break;
+                case "DodajKlienta":
+                    CurrentView = new AddClientViewModel();
+                    IsModuleVisible = true;
+                    break;
+                case "DodajAuto":
+                    CurrentView = new AddCarViewModel();
+                    IsModuleVisible = true;
+                    break;
             }
         }
 
@@ -98,7 +126,7 @@ namespace CarRentalApp.ViewModels
                     if (isBusyToday)
                     {
                         fleet.CurrentStatus = "Wypożyczony";
-                        fleet.StatusColor = "#E74C3C"; 
+                        fleet.StatusColor = "#E74C3C";
                         fleet.IsAvailable = false;
                     }
                     else
@@ -122,21 +150,11 @@ namespace CarRentalApp.ViewModels
             PopulateFilterList(AvailableModels, _allCars.Select(c => c.Car.Model));
             PopulateFilterList(AvailableSegments, _allCars.Select(c => c.Car.Segment));
             PopulateFilterList(AvailableFuelTypes, _allCars.Select(c => c.Car.FuelType));
-
-            AvailableStatuses.Clear();
-            var dostepnyItem = new FilterItem { Name = "Dostępny" };
-            var wypozyczonyItem = new FilterItem { Name = "Wypożyczony" };
-
-            dostepnyItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
-            wypozyczonyItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
-
-            AvailableStatuses.Add(dostepnyItem);
-            AvailableStatuses.Add(wypozyczonyItem);
-
+            PopulateFilterList(AvailableBodyTypes, _allCars.Select(c => c.Car.BodyType));
             PopulateFilterList(AvailableGearboxTypes, _allCars.Select(c => c.Car.GearboxType));
-            
+
             AvailableStatuses.Clear();
-            string[] statuses = { "Dostępny", "Wypożyczony", "Niedostępny" };
+            string[] statuses = { "Dostępny", "Wypożyczony" };
             foreach (var s in statuses)
             {
                 var item = new FilterItem { Name = s };
@@ -175,6 +193,7 @@ namespace CarRentalApp.ViewModels
             if (selectedCount == 1) return collection.First(x => x.IsSelected).Name;
             return $"{selectedCount} wybrane";
         }
+
         [RelayCommand]
         private void ApplyFilters()
         {
@@ -195,7 +214,7 @@ namespace CarRentalApp.ViewModels
             if (selectedBodies.Any()) filtered = filtered.Where(c => selectedBodies.Contains(c.Car.BodyType));
             if (selectedGearboxes.Any()) filtered = filtered.Where(c => selectedGearboxes.Contains(c.Car.GearboxType));
 
-            if (selectedStatuses.Any() && selectedStatuses.Count < 3)
+            if (selectedStatuses.Any() && selectedStatuses.Count < 2)
             {
                 filtered = filtered.Where(c => selectedStatuses.Contains(c.CurrentStatus));
             }
@@ -205,13 +224,10 @@ namespace CarRentalApp.ViewModels
 
             if (SelectedSortOption == "Nazwa (A-Z)")
                 filtered = filtered.OrderBy(c => c.Car.Brand).ThenBy(c => c.Car.Model);
-
             else if (SelectedSortOption == "Nazwa (Z-A)")
                 filtered = filtered.OrderByDescending(c => c.Car.Brand).ThenByDescending(c => c.Car.Model);
-
             else if (SelectedSortOption == "Cena (rosnąco)")
                 filtered = filtered.OrderBy(c => c.Car.PricePerDay);
-
             else if (SelectedSortOption == "Cena (malejąco)")
                 filtered = filtered.OrderByDescending(c => c.Car.PricePerDay);
 
@@ -236,7 +252,6 @@ namespace CarRentalApp.ViewModels
 
             PriceFrom = null;
             PriceTo = null;
-
             SelectedSortOption = "Nazwa (A-Z)";
 
             UpdateSummaries();
@@ -244,15 +259,19 @@ namespace CarRentalApp.ViewModels
         }
 
         [RelayCommand] private void ShowCars() => Navigate("Samochody");
+        [RelayCommand] private void ShowClients() => Navigate("Klienci");
 
         private void ShowHistory()
         {
             if (UserSession.CurrentClient == null) return;
-            try {
-                using (var context = new AppDbContext()) {
+            try
+            {
+                using (var context = new AppDbContext())
+                {
                     var history = context.Reservations
                         .Where(r => r.ClientId == UserSession.CurrentClient.ClientID)
-                        .Select(r => new ReservationHistoryItem {
+                        .Select(r => new ReservationHistoryItem
+                        {
                             CarName = r.CarFleet.Car.Brand + " " + r.CarFleet.Car.Model,
                             Vin = r.CarVin,
                             Dates = r.StartDate.ToString("dd.MM.yyyy") + " - " + r.EndDate.ToString("dd.MM.yyyy"),
@@ -262,21 +281,56 @@ namespace CarRentalApp.ViewModels
                     foreach (var item in history) ReservationsHistory.Add(item);
                 }
                 IsHistoryVisible = true;
-            } catch (Exception ex) { MessageBox.Show($"Błąd: {ex.Message}"); }
+            }
+            catch (Exception ex) { MessageBox.Show($"Błąd: {ex.Message}"); }
+        }
+
+        private void FetchClientsFromDb()
+        {
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    var data = context.Clients.ToList();
+                    AllClients.Clear();
+                    foreach (var c in data) AllClients.Add(c);
+                    ApplyClientFilter();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd pobierania klientów: " + ex.Message);
+            }
+        }
+
+        private void ApplyClientFilter()
+        {
+            var filtered = AllClients.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchClientText))
+            {
+                string search = SearchClientText.ToLower();
+                filtered = filtered.Where(c =>
+                    c.FirstName.ToLower().Contains(search) ||
+                    c.LastName.ToLower().Contains(search) ||
+                    c.Username.ToLower().Contains(search) ||
+                    c.Email.ToLower().Contains(search));
+            }
+
+            FilteredClients.Clear();
+            foreach (var c in filtered) FilteredClients.Add(c);
         }
 
         [RelayCommand]
         private void OpenReservation(string vin)
         {
             var selectedCar = Cars.FirstOrDefault(c => c.Vin == vin);
-
             if (selectedCar != null)
             {
                 var reservationView = new Views.ReservationView(selectedCar.Vin);
                 reservationView.ShowDialog();
                 LoadCarsFromDatabase();
             }
-
         }
 
         [RelayCommand]
@@ -297,11 +351,14 @@ namespace CarRentalApp.ViewModels
         private void ToggleCompare(CarFleet car)
         {
             if (car == null) return;
-            if (car.IsSelectedForCompare) {
+            if (car.IsSelectedForCompare)
+            {
                 var inQueue = CompareQueue.FirstOrDefault(q => q.Vin == car.Vin);
                 if (inQueue != null) CompareQueue.Remove(inQueue);
                 car.IsSelectedForCompare = false;
-            } else {
+            }
+            else
+            {
                 if (CompareQueue.Count >= 3) return;
                 CompareQueue.Add(car);
                 car.IsSelectedForCompare = true;
@@ -312,33 +369,26 @@ namespace CarRentalApp.ViewModels
         [RelayCommand] private void ToggleCompareList() => IsCompareListExpanded = !IsCompareListExpanded;
         [RelayCommand] private void OpenCompare() => new Views.CompareView(CompareQueue.Select(q => q.CarId).ToList()).ShowDialog();
 
-        public class ReservationHistoryItem {
-            public string CarName { get; set; } = string.Empty;
-            public string Vin { get; set; } = string.Empty;
-            public string Dates { get; set; } = string.Empty;
-            public decimal TotalPrice { get; set; }
-        }
-        [ObservableProperty]
-        private bool _isDarkMode = false;
-
         [RelayCommand]
         private void ToggleTheme()
         {
             IsDarkMode = !IsDarkMode;
             string themeName = IsDarkMode ? "DarkTheme" : "LightTheme";
             var uri = new Uri($"Themes/{themeName}.xaml", UriKind.Relative);
-
             var resources = Application.Current.Resources;
-            
-            // Szuka aktualnego motywu i go usuwa
             var oldTheme = resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme.xaml"));
-            if (oldTheme != null)
-            {
-                resources.MergedDictionaries.Remove(oldTheme);
-            }
-
-            // Wrzuca nowy motyw
+            if (oldTheme != null) resources.MergedDictionaries.Remove(oldTheme);
             resources.MergedDictionaries.Add(new ResourceDictionary { Source = uri });
+        }
+
+        [ObservableProperty] private bool _isDarkMode = false;
+
+        public class ReservationHistoryItem
+        {
+            public string CarName { get; set; } = string.Empty;
+            public string Vin { get; set; } = string.Empty;
+            public string Dates { get; set; } = string.Empty;
+            public decimal TotalPrice { get; set; }
         }
     }
 }
