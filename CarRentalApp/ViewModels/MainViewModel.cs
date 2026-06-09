@@ -28,6 +28,12 @@ namespace CarRentalApp.ViewModels
         [ObservableProperty] private bool _isComparePanelVisible;
         [ObservableProperty] private bool _isCompareListExpanded;
 
+        [ObservableProperty] private bool _isAllReservationsVisible = false;
+        [ObservableProperty] private string _searchReservationText = "";
+        public ObservableCollection<ReservationWorkerItem> AllReservationsFiltered { get; } = new();
+        private List<ReservationWorkerItem> _allReservationsRaw = new();
+
+
         public ObservableCollection<CarFleet> CompareQueue { get; } = new();
         public ObservableCollection<CarFleet> Cars { get; } = new();
         public ObservableCollection<ReservationHistoryItem> ReservationsHistory { get; set; } = new();
@@ -65,6 +71,7 @@ namespace CarRentalApp.ViewModels
         partial void OnSelectedSortOptionChanged(string value) => ApplyFilters();
         partial void OnSearchClientTextChanged(string value) => ApplyClientFilter();
 
+        partial void OnSearchReservationTextChanged(string value) => ApplyReservationFilter();
         public MainViewModel()
         {
             IsClient = UserSession.CurrentClient != null;
@@ -80,6 +87,7 @@ namespace CarRentalApp.ViewModels
             IsModuleVisible = false;
             IsClientsVisible = false;
             CurrentView = null;
+            IsAllReservationsVisible = false;
             CurrentPage = target;
 
             switch (target)
@@ -102,6 +110,10 @@ namespace CarRentalApp.ViewModels
                 case "DodajAuto":
                     CurrentView = new AddCarViewModel();
                     IsModuleVisible = true;
+                    break;
+                case "ZarzadzajRezerwacjami":
+                    FetchAllReservationsFromDb();
+                    IsAllReservationsVisible = true;
                     break;
             }
         }
@@ -446,6 +458,70 @@ namespace CarRentalApp.ViewModels
             public DateTime EndDate { get; set; }
             public DateTime? MaxAllowedEndDate { get; set; }
             public bool ShowChangeButton { get; set; } = false;
+        }
+
+        public class ReservationWorkerItem
+        {
+            public int Id { get; set; }
+            public string ClientName { get; set; } = "";
+            public string ClientEmail { get; set; } = "";
+            public string CarName { get; set; } = "";
+            public string CarVin { get; set; } = "";
+            public string Dates { get; set; } = "";
+            public decimal TotalPrice { get; set; }
+            public string StatusText { get; set; } = "";
+            public string StatusColor { get; set; } = "";
+        }
+
+        private void FetchAllReservationsFromDb()
+        {
+            try
+            {
+                using (var context = new AppDbContext())
+                {
+                    var today = DateTime.Now.Date;
+                    var data = context.Reservations
+                        .Include(r => r.Client)
+                        .Include(r => r.CarFleet).ThenInclude(f => f.Car)
+                        .AsNoTracking()
+                        .ToList()
+                        .Select(r => new ReservationWorkerItem
+                        {
+                            Id = r.Id,
+                            ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
+                            ClientEmail = r.Client.Email,
+                            CarName = r.CarFleet?.Car?.FullName ?? "Nieznany model",
+                            CarVin = r.CarVin,
+                            Dates = $"{r.StartDate:dd.MM.yyyy} - {r.EndDate:dd.MM.yyyy}",
+                            TotalPrice = r.TotalPrice,
+                            // Jeśli dzisiejsza data jest po EndDate -> Zakończona
+                            StatusText = r.EndDate.Date < today ? "Zakończona" : "Aktywna",
+                            StatusColor = r.EndDate.Date < today ? "#95A5A6" : "#27AE60"
+                        }).ToList();
+
+                    _allReservationsRaw = data;
+                    ApplyReservationFilter();
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Błąd: " + ex.Message); }
+        }
+
+        // 3. Metoda filtrująca
+        private void ApplyReservationFilter()
+        {
+            var filtered = _allReservationsRaw.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchReservationText))
+            {
+                string s = SearchReservationText.ToLower();
+                filtered = filtered.Where(r =>
+                    r.ClientName.ToLower().Contains(s) ||
+                    r.CarName.ToLower().Contains(s) ||
+                    r.CarVin.ToLower().Contains(s));
+            }
+
+            AllReservationsFiltered.Clear();
+            foreach (var item in filtered) AllReservationsFiltered.Add(item);
         }
     }
 }
