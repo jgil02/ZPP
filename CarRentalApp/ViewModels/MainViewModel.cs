@@ -2,13 +2,12 @@
 using CarRentalApp.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System;
 
 namespace CarRentalApp.ViewModels
 {
@@ -76,13 +75,12 @@ namespace CarRentalApp.ViewModels
         [RelayCommand]
         private void Navigate(string target)
         {
-            // Resetowanie wszystkich widoków
             IsCarsVisible = false;
             IsHistoryVisible = false;
             IsModuleVisible = false;
             IsClientsVisible = false;
             CurrentView = null;
-            CurrentPage = target; // Ustawienie dla podświetlenia menu
+            CurrentPage = target;
 
             switch (target)
             {
@@ -158,7 +156,7 @@ namespace CarRentalApp.ViewModels
             foreach (var s in statuses)
             {
                 var item = new FilterItem { Name = s };
-                item.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
+                item.PropertyChanged += (sender, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
                 AvailableStatuses.Add(item);
             }
             UpdateSummaries();
@@ -170,7 +168,7 @@ namespace CarRentalApp.ViewModels
             foreach (var item in items.Distinct().Where(x => !string.IsNullOrEmpty(x)))
             {
                 var filterItem = new FilterItem { Name = item };
-                filterItem.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
+                filterItem.PropertyChanged += (sender, e) => { if (e.PropertyName == nameof(FilterItem.IsSelected)) UpdateSummaries(); };
                 collection.Add(filterItem);
             }
         }
@@ -275,7 +273,7 @@ namespace CarRentalApp.ViewModels
                             .ThenInclude(cf => cf.Car)
                         .Where(r => r.ClientId == UserSession.CurrentClient.ClientID)
                         .OrderByDescending(r => r.StartDate)
-                        .ToList(); 
+                        .ToList();
 
                     var history = reservations.Select(r =>
                     {
@@ -310,7 +308,6 @@ namespace CarRentalApp.ViewModels
                 }
                 IsHistoryVisible = true;
             }
-           
             catch (Exception ex)
             {
                 MessageBox.Show($"Błąd: {ex.Message}");
@@ -322,12 +319,18 @@ namespace CarRentalApp.ViewModels
         {
             if (item == null) return;
 
-            var owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView);
-            var wnd = new Views.ChangeEndDateView(item.Id, item.Vin, item.EndDate);
-            if (owner != null) wnd.Owner = owner;
-            wnd.ShowDialog();
-
-            ShowHistory();
+            try
+            {
+                var owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w is Views.MainView);
+                var wnd = new Views.ChangeEndDateView(item.Id, item.Vin, item.EndDate);
+                if (owner != null) wnd.Owner = owner;
+                wnd.ShowDialog();
+                ShowHistory();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening change-date window:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void FetchClientsFromDb()
@@ -414,7 +417,26 @@ namespace CarRentalApp.ViewModels
         [RelayCommand] private void ToggleCompareList() => IsCompareListExpanded = !IsCompareListExpanded;
         [RelayCommand] private void OpenCompare() => new Views.CompareView(CompareQueue.Select(q => q.CarId).ToList()).ShowDialog();
 
-        public class ReservationHistoryItem {
+        [ObservableProperty] private bool _isDarkMode = false;
+
+        [RelayCommand]
+        private void ToggleTheme()
+        {
+            IsDarkMode = !IsDarkMode;
+            string themeName = IsDarkMode ? "DarkTheme" : "LightTheme";
+            var uri = new Uri($"Themes/{themeName}.xaml", UriKind.Relative);
+            var resources = Application.Current.Resources;
+
+            var oldTheme = resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme.xaml"));
+            if (oldTheme != null)
+            {
+                resources.MergedDictionaries.Remove(oldTheme);
+            }
+            resources.MergedDictionaries.Add(new ResourceDictionary { Source = uri });
+        }
+
+        public class ReservationHistoryItem
+        {
             public int Id { get; set; }
             public string CarName { get; set; } = string.Empty;
             public string Vin { get; set; } = string.Empty;
@@ -424,34 +446,6 @@ namespace CarRentalApp.ViewModels
             public DateTime EndDate { get; set; }
             public DateTime? MaxAllowedEndDate { get; set; }
             public bool ShowChangeButton { get; set; } = false;
-        }
-        [ObservableProperty]
-        private bool _isDarkMode = false;
-
-        [RelayCommand]
-        private void ToggleTheme()
-        {
-            IsDarkMode = !IsDarkMode;
-            string themeName = IsDarkMode ? "DarkTheme" : "LightTheme";
-            var uri = new Uri($"Themes/{themeName}.xaml", UriKind.Relative);
-            var resources = Application.Current.Resources;
-            
-            var oldTheme = resources.MergedDictionaries.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.Contains("Theme.xaml"));
-            if (oldTheme != null)
-            {
-                resources.MergedDictionaries.Remove(oldTheme);
-            }
-            resources.MergedDictionaries.Add(new ResourceDictionary { Source = uri });
-        }
-
-        [ObservableProperty] private bool _isDarkMode = false;
-
-        public class ReservationHistoryItem
-        {
-            public string CarName { get; set; } = string.Empty;
-            public string Vin { get; set; } = string.Empty;
-            public string Dates { get; set; } = string.Empty;
-            public decimal TotalPrice { get; set; }
         }
     }
 }
